@@ -1,0 +1,170 @@
+import numpy as np
+import pandas as pd
+
+
+# TREATY ARRAY CREATION
+
+#read in the country, year, NPT, NWFZ info from excel to pandas to single numpy array
+#col 0 = ccode, col 1 = year, col 2 = NPT (0,1,2), col 3 = NWFZ (0,1,2)
+treaty40s = pd.read_excel("TreatyData '45-'49 v1.xlsx", sheetname="CountryTreatiesClean")
+treaty40s_array = treaty40s.as_matrix()
+treaty50s = pd.read_excel("TreatyData '50-'59 v1.xlsx", sheetname="CountryTreatiesClean")
+treaty50s_array = treaty50s.as_matrix()
+treaty60s = pd.read_excel("TreatyData '60-'69 v1.xlsx", sheetname="CountryTreatiesClean")
+treaty60s_array = treaty60s.as_matrix()
+treaty70s = pd.read_excel("TreatyData '70-'79 v1.xlsx", sheetname="CountryTreatiesClean")
+treaty70s_array = treaty70s.as_matrix()
+treaty80s = pd.read_excel("TreatyData '80-'89 v1.xlsx", sheetname="CountryTreatiesClean")
+treaty80s_array = treaty80s.as_matrix()
+treaty90s = pd.read_excel("TreatyData '90-'00 v1.xlsx", sheetname="CountryTreatiesClean")
+treaty90s_array = treaty90s.as_matrix()
+treaty_array = np.append(treaty40s_array,treaty50s_array,axis=0)
+treaty_array = np.append(treaty_array,treaty60s_array,axis=0)
+treaty_array = np.append(treaty_array,treaty70s_array,axis=0)
+treaty_array = np.append(treaty_array,treaty80s_array,axis=0)
+treaty_array = np.append(treaty_array,treaty90s_array,axis=0)
+
+#this section separates out NPT signatures and ratifications
+#col 4 = NPT sign, col 5 = NPT ratify
+NPTsigBoolean = np.logical_or(treaty_array[:,2]==1,treaty_array[:,2]==2)
+NPTratBoolean = np.greater_equal(treaty_array[:,2],2)
+NPTsigColumn = NPTsigBoolean.astype(int)
+NPTratColumn = NPTratBoolean.astype(int)
+NPTsigColumn = np.reshape(NPTsigColumn,(len(NPTsigColumn),1))
+NPTratColumn = np.reshape(NPTratColumn,(len(NPTratColumn),1))
+treaty_array = np.concatenate((treaty_array,NPTsigColumn),axis=1)
+treaty_array = np.concatenate((treaty_array,NPTratColumn),axis=1)
+
+#this section separates out NWFZ signatures and ratifications
+#col 6 = NWFZ sign, col 7 = NWFZ ratify
+NWFZsigBoolean = np.logical_or(treaty_array[:,3]==1,treaty_array[:,3]==2)
+NWFZratBoolean = np.greater_equal(treaty_array[:,3],2)
+NWFZsigColumn = NWFZsigBoolean.astype(int)
+NWFZratColumn = NWFZratBoolean.astype(int)
+NWFZsigColumn = np.reshape(NWFZsigColumn,(len(NWFZsigColumn),1))
+NWFZratColumn = np.reshape(NWFZratColumn,(len(NWFZratColumn),1))
+treaty_array = np.concatenate((treaty_array,NWFZsigColumn),axis=1)
+treaty_array = np.concatenate((treaty_array,NWFZratColumn),axis=1)
+
+
+#read in the country, year, country normalization info from excel to pandas to single numpy array
+cNormal40s = pd.read_excel("TreatyData '45-'49 v1.xlsx", sheetname="CountryNormalization")
+cNormal40s_array = cNormal40s.as_matrix()
+cNormal50s = pd.read_excel("TreatyData '50-'59 v1.xlsx", sheetname="CountryNormalization")
+cNormal50s_array = cNormal50s.as_matrix()
+cNormal60s = pd.read_excel("TreatyData '60-'69 v1.xlsx", sheetname="CountryNormalization")
+cNormal60s_array = cNormal60s.as_matrix()
+cNormal70s = pd.read_excel("TreatyData '70-'79 v1.xlsx", sheetname="CountryNormalization")
+cNormal70s_array = cNormal70s.as_matrix()
+cNormal80s = pd.read_excel("TreatyData '80-'89 v1.xlsx", sheetname="CountryNormalization")
+cNormal80s_array = cNormal80s.as_matrix()
+cNormal90s = pd.read_excel("TreatyData '90-'00 v1.xlsx", sheetname="CountryNormalization")
+cNormal90s_array = cNormal90s.as_matrix()
+cNormal_array = np.append(cNormal40s_array,cNormal50s_array,axis=0)
+cNormal_array = np.append(cNormal_array,cNormal60s_array,axis=0)
+cNormal_array = np.append(cNormal_array,cNormal70s_array,axis=0)
+cNormal_array = np.append(cNormal_array,cNormal80s_array,axis=0)
+cNormal_array = np.append(cNormal_array,cNormal90s_array,axis=0)
+
+
+#read in the treaty, year, treaty normalization info from excel to pandas to single numpy array
+tNormal40s = pd.read_excel("TreatyData '45-'49 v1.xlsx", sheetname="TreatyNormalization")
+tNormal40s_array = tNormal40s.as_matrix()
+tNormal50s = pd.read_excel("TreatyData '50-'59 v1.xlsx", sheetname="TreatyNormalization")
+tNormal50s_array = tNormal50s.as_matrix()
+tNormal60s = pd.read_excel("TreatyData '60-'69 v1.xlsx", sheetname="TreatyNormalization")
+tNormal60s_array = tNormal60s.as_matrix()
+tNormal70s = pd.read_excel("TreatyData '70-'79 v1.xlsx", sheetname="TreatyNormalization")
+tNormal70s_array = tNormal70s.as_matrix()
+tNormal80s = pd.read_excel("TreatyData '80-'89 v1.xlsx", sheetname="TreatyNormalization")
+tNormal80s_array = tNormal80s.as_matrix()
+tNormal90s = pd.read_excel("TreatyData '90-'00 v1.xlsx", sheetname="TreatyNormalization")
+tNormal90s_array = tNormal90s.as_matrix()
+tNormal_array = np.append(tNormal40s_array,tNormal50s_array,axis=0)
+tNormal_array = np.append(tNormal_array,tNormal60s_array,axis=0)
+tNormal_array = np.append(tNormal_array,tNormal70s_array,axis=0)
+tNormal_array = np.append(tNormal_array,tNormal80s_array,axis=0)
+tNormal_array = np.append(tNormal_array,tNormal90s_array,axis=0)
+
+
+#read in the country, year, proliferation level info from excel to pandas to single numpy array
+prolif40s = pd.read_excel("TreatyData '45-'49 v1.xlsx", sheetname="ProliferationLevel")
+prolif40s_array = prolif40s.as_matrix()
+prolif50s = pd.read_excel("TreatyData '50-'59 v1.xlsx", sheetname="ProliferationLevel")
+prolif50s_array = prolif50s.as_matrix()
+prolif60s = pd.read_excel("TreatyData '60-'69 v1.xlsx", sheetname="ProliferationLevel")
+prolif60s_array = prolif60s.as_matrix()
+prolif70s = pd.read_excel("TreatyData '70-'79 v1.xlsx", sheetname="ProliferationLevel")
+prolif70s_array = prolif70s.as_matrix()
+prolif80s = pd.read_excel("TreatyData '80-'89 v1.xlsx", sheetname="ProliferationLevel")
+prolif80s_array = prolif80s.as_matrix()
+prolif90s = pd.read_excel("TreatyData '90-'00 v1.xlsx", sheetname="ProliferationLevel")
+prolif90s_array = prolif90s.as_matrix()
+prolif_array = np.append(prolif40s_array,prolif50s_array,axis=0)
+prolif_array = np.append(prolif_array,prolif60s_array,axis=0)
+prolif_array = np.append(prolif_array,prolif70s_array,axis=0)
+prolif_array = np.append(prolif_array,prolif80s_array,axis=0)
+prolif_array = np.append(prolif_array,prolif90s_array,axis=0)
+
+#read in the country and treaty keys
+countryKey = pd.read_excel("TreatyData '45-'49 v1.xlsx", sheetname="CountryKey")
+treatyKey = pd.read_excel("TreatyData '45-'49 v1.xlsx", sheetname="TreatyKey")
+
+#start and end years
+startyear = 1945
+endyear = 2000
+
+#cycle through treaties to get matrices by year and store in a dictionary
+j = startyear
+treaty_dict = {}
+while j < endyear + 1:
+    variable = np.empty((0,8), dtype="int")
+    i=0
+    while i < len(treaty_array):
+        if treaty_array[i,1]==j:
+            variable = np.vstack([variable,treaty_array[i]])
+        i=i+1
+    treaty_dict[j]=variable
+    j=j+1
+
+#cycle through country normalizations to get matrices by year and store in a dictionary
+j = startyear
+cNormal_dict = {}
+while j < endyear + 1:
+    variable = np.empty((0,3), dtype="int")
+    i=0
+    while i < len(cNormal_array):
+        if cNormal_array[i,1]==j:
+            variable = np.vstack([variable,cNormal_array[i]])
+        i=i+1
+    cNormal_dict[j]=variable
+    j=j+1
+
+#cycle through treaty normalizations to get matrices by year and store in a dictionary
+j = startyear
+tNormal_dict = {}
+while j < endyear + 1:
+    variable = np.empty((0,3), dtype="int")
+    i=0
+    while i < len(tNormal_array):
+        if tNormal_array[i,1]==j:
+            variable = np.vstack([variable,tNormal_array[i]])
+        i=i+1
+    #starting in 1968, want to get NPT normalization as total countries in that year
+    if j > 1967:
+        variable = np.vstack([variable,[6,j,len(cNormal_dict[j])]])
+    tNormal_dict[j]=variable
+    j=j+1
+
+#cycle through proliferation levels to get matrices by year and store in a dictionary
+j = startyear
+prolif_dict = {}
+while j < endyear + 1:
+    variable = np.empty((0,3), dtype="int")
+    i=0
+    while i < len(prolif_array):
+        if prolif_array[i,1]==j:
+            variable = np.vstack([variable,prolif_array[i]])
+        i=i+1
+    prolif_dict[j]=variable
+    j=j+1
