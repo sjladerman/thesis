@@ -67,7 +67,8 @@ cNormal_array = np.append(cNormal_array,cNormal60s_array,axis=0)
 cNormal_array = np.append(cNormal_array,cNormal70s_array,axis=0)
 cNormal_array = np.append(cNormal_array,cNormal80s_array,axis=0)
 cNormal_array = np.append(cNormal_array,cNormal90s_array,axis=0)
-
+# for separate networks, need to divide the last column by 2
+cNormal_array[:,2] = cNormal_array[:,2] / 2
 
 #read in the treaty, year, treaty normalization info from excel to pandas to single numpy array
 tNormal40s = pd.read_excel("TreatyData '45-'49 v1.xlsx", sheetname="TreatyNormalization")
@@ -116,19 +117,6 @@ treatyKey = pd.read_excel("TreatyData '45-'49 v1.xlsx", sheetname="TreatyKey")
 startyear = 1945
 endyear = 2000
 
-#cycle through treaties to get matrices by year and store in a dictionary
-j = startyear
-treaty_dict = {}
-while j < endyear + 1:
-    variable = np.empty((0,8), dtype="int")
-    i=0
-    while i < len(treaty_array):
-        if treaty_array[i,1]==j:
-            variable = np.vstack([variable,treaty_array[i]])
-        i=i+1
-    treaty_dict[j]=variable
-    j=j+1
-
 #cycle through country normalizations to get matrices by year and store in a dictionary
 j = startyear
 cNormal_dict = {}
@@ -158,9 +146,11 @@ while j < endyear + 1:
     tNormal_dict[j]=variable
     j=j+1
 
-#cycle through proliferation levels to get matrices by year and store in a dictionary
+# cycle through proliferation levels to get matrices by year and store in a dictionary
+# also calculating world proliferation total and storing that in another dictionary
 j = startyear
 prolif_dict = {}
+world_prolif_dict = {}
 while j < endyear + 1:
     variable = np.empty((0,3), dtype="int")
     i=0
@@ -169,29 +159,77 @@ while j < endyear + 1:
             variable = np.vstack([variable,prolif_array[i]])
         i=i+1
     prolif_dict[j]=variable
+    # now calculating the sum of proliferation levels and adding that to a new dict
+    sum_array = np.sum(variable,axis=0)
+    world_prolif_dict[j] = sum_array[2]
     j=j+1
 
-#calculating the normalized affiliation matrix (matrix A)
-#also storing the list of countries by year
+
+
+# SEPARATING OUT SIGNATURE AND RATIFICATION NETWORKS
+
+# creating an array for sig with ccode (0), year (1), NPT sig (2), NWFZ sig (3)
+ccode_column = np.reshape(treaty_array[:,0],(len(treaty_array[:,0]),1))
+year_column = np.reshape(treaty_array[:,1],(len(treaty_array[:,1]),1))
+sig_treaty_array = np.concatenate((ccode_column,year_column),axis=1)
+sig_treaty_array = np.concatenate((sig_treaty_array,NPTsigColumn),axis=1)
+sig_treaty_array = np.concatenate((sig_treaty_array,NWFZsigColumn),axis=1)
+
+# creating an array for rat with ccode (0), year (1), NPT rat (2), NWFZ rat (3)
+ccode_column = np.reshape(treaty_array[:,0],(len(treaty_array[:,0]),1))
+year_column = np.reshape(treaty_array[:,1],(len(treaty_array[:,1]),1))
+rat_treaty_array = np.concatenate((ccode_column,year_column),axis=1)
+rat_treaty_array = np.concatenate((rat_treaty_array,NPTratColumn),axis=1)
+rat_treaty_array = np.concatenate((rat_treaty_array,NWFZratColumn),axis=1)
+
+# cycle through sig array to get matrices by year and store in a dict (sig network)
 j = startyear
-normal_matrix_dict = {}
+sig_treaty_dict = {}
+while j < endyear + 1:
+    variable = np.empty((0,4), dtype="int") # change to (0,8) for full network
+    i=0
+    while i < len(sig_treaty_array):
+        if sig_treaty_array[i,1]==j:
+            variable = np.vstack([variable,sig_treaty_array[i]])
+        i=i+1
+    sig_treaty_dict[j]=variable
+    j=j+1
+
+# cycle through rat array to get matrices by year and store in a dict (rat network)
+j = startyear
+rat_treaty_dict = {}
+while j < endyear + 1:
+    variable = np.empty((0,4), dtype="int") # change to (0,8) for full network
+    i=0
+    while i < len(rat_treaty_array):
+        if rat_treaty_array[i,1]==j:
+            variable = np.vstack([variable,rat_treaty_array[i]])
+        i=i+1
+    rat_treaty_dict[j]=variable
+    j=j+1
+
+# SIGNATURE NETWORK
+# calculating the normalized affiliation matrix (matrix A)
+# also storing the list of countries by year (only done here and not for rat as they're the same)
+j = startyear
+normal_sig_matrix_dict = {}
 country_list_yearly = {}
 while j < endyear + 1:
     i=0
-    variable = np.empty((len(treaty_dict[j]),4))
-    countries = np.empty((len(treaty_dict[j]),1), dtype="int")
-    while i < len(treaty_dict[j]):
-        countries[i]=treaty_dict[j][i,0]
-        h=0
-        while h < 4:
+    variable = np.empty((len(sig_treaty_dict[j]),2)) # the 2 would be a 4 for full network
+    countries = np.empty((len(sig_treaty_dict[j]),1), dtype="int")
+    while i < len(sig_treaty_dict[j]):
+        countries[i]=sig_treaty_dict[j][i,0]
+        h = 0
+        while h < 2: # would be < 4 for full network
             #getting normalizations for NPT
-            if h < 2:
-                if cNormal_dict[j][i,2]==0:
+            if h == 0:
+                if cNormal_dict[j][i,2] == 0:
                     variable[i,h]=0
-                elif tNormal_dict[j][5,2]==0:
+                elif tNormal_dict[j][5,2] == 0:
                     variable[i,h]=0
-                else:
-                    variable[i,h]=treaty_dict[j][i,h+4]/math.sqrt(cNormal_dict[j][i,2]*tNormal_dict[j][5,2])
+                else: # for full network, would look at h+4 for original treaty_dict value
+                    variable[i,h]=sig_treaty_dict[j][i,h+2]/math.sqrt(cNormal_dict[j][i,2]*tNormal_dict[j][5,2])
             #getting normalizations for NWFZs
             else:
                 total = tNormal_dict[j][0,2] + tNormal_dict[j][1,2] + tNormal_dict[j][2,2] + tNormal_dict[j][3,2] + tNormal_dict[j][4,2]
@@ -199,135 +237,266 @@ while j < endyear + 1:
                     variable[i,h]=0
                 elif total==0:
                     variable[i,h]=0
-                else:
-                    variable[i,h]=treaty_dict[j][i,h+3]/math.sqrt(cNormal_dict[j][i,2]*total)
+                else: # would look at h+3 for original treaty_dict value
+                    variable[i,h]=sig_treaty_dict[j][i,h+2]/math.sqrt(cNormal_dict[j][i,2]*total)
             h=h+1
         i=i+1
-    normal_matrix_dict[j]=variable
+    normal_sig_matrix_dict[j]=variable
     country_list_yearly[j]=countries
     j=j+1
 
-#calculating the transposes normalized affiliation matrix (matrix A')
+# RATIFICATION NETWORK
+# calculating the normalized affiliation matrix (matrix A)
 j = startyear
-normal_matrix_dict_t = {}
+normal_rat_matrix_dict = {}
 while j < endyear + 1:
-    matrix = normal_matrix_dict[j]
+    i=0
+    variable = np.empty((len(rat_treaty_dict[j]),2)) # the 2 would be a 4 for full network
+    countries = np.empty((len(rat_treaty_dict[j]),1), dtype="int")
+    while i < len(rat_treaty_dict[j]):
+        h = 0
+        while h < 2: # would be < 4 for full network
+            #getting normalizations for NPT
+            if h == 0:
+                if cNormal_dict[j][i,2] == 0:
+                    variable[i,h]=0
+                elif tNormal_dict[j][5,2] == 0:
+                    variable[i,h]=0
+                else: # for full network, would look at h+4 for original treaty_dict value
+                    variable[i,h]=rat_treaty_dict[j][i,h+2]/math.sqrt(cNormal_dict[j][i,2]*tNormal_dict[j][5,2])
+            #getting normalizations for NWFZs
+            else:
+                total = tNormal_dict[j][0,2] + tNormal_dict[j][1,2] + tNormal_dict[j][2,2] + tNormal_dict[j][3,2] + tNormal_dict[j][4,2]
+                if cNormal_dict[j][i,2]==0:
+                    variable[i,h]=0
+                elif total==0:
+                    variable[i,h]=0
+                else: # would look at h+3 for original treaty_dict value
+                    variable[i,h]=rat_treaty_dict[j][i,h+2]/math.sqrt(cNormal_dict[j][i,2]*total)
+            h=h+1
+        i=i+1
+    normal_rat_matrix_dict[j]=variable
+    j=j+1
+
+
+#calculating the transposes of normalized affiliation matrices (matrix A') for sig
+j = startyear
+normal_sig_matrix_dict_t = {}
+while j < endyear + 1:
+    matrix = normal_sig_matrix_dict[j]
     tmatrix = matrix.transpose()
-    normal_matrix_dict_t[j]=tmatrix
+    normal_sig_matrix_dict_t[j]=tmatrix
     j=j+1
 
-#comembership matrix XN
+#calculating the transposes of normalized affiliation matrices (matrix A') for rat
 j = startyear
-comember_dict = {}
+normal_rat_matrix_dict_t = {}
 while j < endyear + 1:
-    matrix = normal_matrix_dict[j]
-    tmatrix = normal_matrix_dict_t[j]
-    comember_dict[j]=np.dot(matrix,tmatrix)
+    matrix = normal_rat_matrix_dict[j]
+    tmatrix = matrix.transpose()
+    normal_rat_matrix_dict_t[j]=tmatrix
     j=j+1
 
-#common actors matrix XM
+#comembership matrix XN for sig
 j = startyear
-com_actor_dict = {}
+comember_sig_dict = {}
 while j < endyear + 1:
-    matrix = normal_matrix_dict[j]
-    tmatrix = normal_matrix_dict_t[j]
-    com_actor_dict[j]=np.dot(tmatrix,matrix)
+    matrix = normal_sig_matrix_dict[j]
+    tmatrix = normal_sig_matrix_dict_t[j]
+    comember_sig_dict[j]=np.dot(matrix,tmatrix)
     j=j+1
 
-#actor eigenvalues and eigenvectors
+#comembership matrix XN for rat
 j = startyear
-evalues_countries_dict = {}
-evectors_countries_dict = {}
+comember_rat_dict = {}
 while j < endyear + 1:
-    w,v = linalg.eigh(comember_dict[j])
+    matrix = normal_rat_matrix_dict[j]
+    tmatrix = normal_rat_matrix_dict_t[j]
+    comember_rat_dict[j]=np.dot(matrix,tmatrix)
+    j=j+1
+
+#common actors matrix XM for sig
+j = startyear
+com_actor_sig_dict = {}
+while j < endyear + 1:
+    matrix = normal_sig_matrix_dict[j]
+    tmatrix = normal_sig_matrix_dict_t[j]
+    com_actor_sig_dict[j]=np.dot(tmatrix,matrix)
+    j=j+1
+
+#common actors matrix XM for rat
+j = startyear
+com_actor_rat_dict = {}
+while j < endyear + 1:
+    matrix = normal_rat_matrix_dict[j]
+    tmatrix = normal_rat_matrix_dict_t[j]
+    com_actor_rat_dict[j]=np.dot(tmatrix,matrix)
+    j=j+1
+
+#actor eigenvalues and eigenvectors for sig
+j = startyear
+evalues_countries_sig_dict = {}
+evectors_countries_sig_dict = {}
+while j < endyear + 1:
+    w,v = linalg.eigh(comember_sig_dict[j])
     #finding max evalue
     max_evalue = np.amax(w)
     if max_evalue==0:
         #store a 0 if the eigenvalue is 0
-        evectors_countries_dict[j]=0
+        evectors_countries_sig_dict[j]=0
     else:
         #finding location of max evalue
         a = np.argmax(w)
         #store evectors in the dictionary
-        evectors_countries_dict[j]=abs(v[:,a])
+        evectors_countries_sig_dict[j]=abs(v[:,a])
     #store evalue in the dictionary
-    evalues_countries_dict[j]=math.sqrt(max_evalue)
+    evalues_countries_sig_dict[j]=math.sqrt(max_evalue)
     j=j+1
 
-#treaty eigenvalues and eigenvectors
+#actor eigenvalues and eigenvectors for rat
 j = startyear
-evalues_treaties_dict = {}
-evectors_treaties_dict = {}
+evalues_countries_rat_dict = {}
+evectors_countries_rat_dict = {}
 while j < endyear + 1:
-    w,v = linalg.eigh(com_actor_dict[j])
+    w,v = linalg.eigh(comember_rat_dict[j])
     #finding max evalue
     max_evalue = np.amax(w)
     if max_evalue==0:
-        evectors_treaties_dict[j]=0
+        #store a 0 if the eigenvalue is 0
+        evectors_countries_rat_dict[j]=0
     else:
         #finding location of max evalue
         a = np.argmax(w)
-        evectors_treaties_dict[j]=abs(v[:,a])
+        #store evectors in the dictionary
+        evectors_countries_rat_dict[j]=abs(v[:,a])
     #store evalue in the dictionary
-    evalues_treaties_dict[j]=math.sqrt(max_evalue)
+    evalues_countries_rat_dict[j]=math.sqrt(max_evalue)
     j=j+1
 
-#put ccode and tcode with centralities
-#in treaty centrality, 1 = NPT sign, 2 = NPT ratify, 3 = NWFZ sign, 4 = NWFZ ratify
+#treaty eigenvalues and eigenvectors for sig
+j = startyear
+evalues_treaties_sig_dict = {}
+evectors_treaties_sig_dict = {}
+while j < endyear + 1:
+    w,v = linalg.eigh(com_actor_sig_dict[j])
+    #finding max evalue
+    max_evalue = np.amax(w)
+    if max_evalue==0:
+        evectors_treaties_sig_dict[j]=0
+    else:
+        #finding location of max evalue
+        a = np.argmax(w)
+        evectors_treaties_sig_dict[j]=abs(v[:,a])
+    #store evalue in the dictionary
+    evalues_treaties_sig_dict[j]=math.sqrt(max_evalue)
+    j=j+1
+
+#treaty eigenvalues and eigenvectors for rat
+j = startyear
+evalues_treaties_rat_dict = {}
+evectors_treaties_rat_dict = {}
+while j < endyear + 1:
+    w,v = linalg.eigh(com_actor_rat_dict[j])
+    #finding max evalue
+    max_evalue = np.amax(w)
+    if max_evalue==0:
+        evectors_treaties_rat_dict[j]=0
+    else:
+        #finding location of max evalue
+        a = np.argmax(w)
+        evectors_treaties_rat_dict[j]=abs(v[:,a])
+    #store evalue in the dictionary
+    evalues_treaties_rat_dict[j]=math.sqrt(max_evalue)
+    j=j+1
+
+# put ccode and tcode with centralities for signature network
+# in treaty centrality, 1 = NPT sign, 2 = NWFZ sign
+# for full network, treaty centrality would be 1=NPT sig, 2=NPT rat, 3=NWFZ sig, 4=NWFZ rat
 j=startyear
-country_centrality_dict = {}
-treaty_centrality_dict = {}
-treaties = np.array((1,2,3,4))
+country_centrality_sig_dict = {}
+treaty_centrality_sig_dict = {}
+treaties = np.array((1,2))
 treaties = np.reshape(treaties,(len(treaties),1))
 while j < endyear + 1:
-    if type(evectors_countries_dict[j]) == int:
+    if type(evectors_countries_sig_dict[j]) == int:
         carray = np.reshape(country_list_yearly[j],(len(country_list_yearly[j]),1))
         ecarray = np.zeros(len(country_list_yearly[j]))
         ecarray = np.reshape(ecarray,(len(ecarray),1))
         newcarray = np.concatenate((carray,ecarray),axis=1)
-        country_centrality_dict[j]=newcarray
+        country_centrality_sig_dict[j]=newcarray
     else:
         carray = np.reshape(country_list_yearly[j],(len(country_list_yearly[j]),1))
-        ecarray = np.reshape(evectors_countries_dict[j],(len(evectors_countries_dict[j]),1))
+        ecarray = np.reshape(evectors_countries_sig_dict[j],(len(evectors_countries_sig_dict[j]),1))
         newcarray = np.concatenate((carray,ecarray),axis=1)
-        country_centrality_dict[j]=newcarray
-    if type(evectors_treaties_dict[j]) == int:
-        etarray = np.zeros(4)
+        country_centrality_sig_dict[j]=newcarray
+    if type(evectors_treaties_sig_dict[j]) == int:
+        etarray = np.zeros(2) # would be 4 for full network
         etarray = np.reshape(etarray,(len(etarray),1))
         newtreaties = np.concatenate((treaties,etarray),axis=1)
-        treaty_centrality_dict[j]=newtreaties
+        treaty_centrality_sig_dict[j]=newtreaties
     else:
-        etarray = np.reshape(evectors_treaties_dict[j],(len(evectors_treaties_dict[j]),1))
+        etarray = np.reshape(evectors_treaties_sig_dict[j],(len(evectors_treaties_sig_dict[j]),1))
         newtreaties = np.concatenate((treaties,etarray),axis=1)
-        treaty_centrality_dict[j]=newtreaties
+        treaty_centrality_sig_dict[j]=newtreaties
     j=j+1
 
-#get npt sig cent scores array for y values
+# put ccode and tcode with centralities for ratification network
+# in treaty centrality, 1 = NPT rat, 2 = NWFZ rat
+# for full network, treaty centrality would be 1=NPT sig, 2=NPT rat, 3=NWFZ sig, 4=NWFZ rat
+j=startyear
+country_centrality_rat_dict = {}
+treaty_centrality_rat_dict = {}
+treaties = np.array((1,2))
+treaties = np.reshape(treaties,(len(treaties),1))
+while j < endyear + 1:
+    if type(evectors_countries_rat_dict[j]) == int:
+        carray = np.reshape(country_list_yearly[j],(len(country_list_yearly[j]),1))
+        ecarray = np.zeros(len(country_list_yearly[j]))
+        ecarray = np.reshape(ecarray,(len(ecarray),1))
+        newcarray = np.concatenate((carray,ecarray),axis=1)
+        country_centrality_rat_dict[j]=newcarray
+    else:
+        carray = np.reshape(country_list_yearly[j],(len(country_list_yearly[j]),1))
+        ecarray = np.reshape(evectors_countries_rat_dict[j],(len(evectors_countries_rat_dict[j]),1))
+        newcarray = np.concatenate((carray,ecarray),axis=1)
+        country_centrality_rat_dict[j]=newcarray
+    if type(evectors_treaties_rat_dict[j]) == int:
+        etarray = np.zeros(2) # would be 4 for full network
+        etarray = np.reshape(etarray,(len(etarray),1))
+        newtreaties = np.concatenate((treaties,etarray),axis=1)
+        treaty_centrality_rat_dict[j]=newtreaties
+    else:
+        etarray = np.reshape(evectors_treaties_rat_dict[j],(len(evectors_treaties_rat_dict[j]),1))
+        newtreaties = np.concatenate((treaties,etarray),axis=1)
+        treaty_centrality_rat_dict[j]=newtreaties
+    j=j+1
+
+# get NPT siganture centrality scores array for y values
 j=startyear
 NPTsigarray = list()
 while j < endyear + 1:
-    NPTsigarray.append(treaty_centrality_dict[j][0,1])
+    NPTsigarray.append(treaty_centrality_sig_dict[j][0,1])
     j=j+1
 
-#get npt ratify cent scores array for y values
-j=startyear
-NPTratarray = list()
-while j < endyear + 1:
-    NPTratarray.append(treaty_centrality_dict[j][1,1])
-    j=j+1
-
-#get nwfz sig cent scores array for y values
+# get NWFZ signature centrality scores array for y values
 j=startyear
 NWFZsigarray = list()
 while j < endyear + 1:
-    NWFZsigarray.append(treaty_centrality_dict[j][2,1])
+    NWFZsigarray.append(treaty_centrality_sig_dict[j][1,1]) # would be [2,1] for full network
     j=j+1
 
-#get npt ratify cent scores array for y values
+# get NPT ratification centrality scores array for y values
+j=startyear
+NPTratarray = list()
+while j < endyear + 1:
+    NPTratarray.append(treaty_centrality_rat_dict[j][0,1]) # would be [1,1] for full network
+    j=j+1
+
+#get NWFZ ratification centrality scores array for y values
 j=startyear
 NWFZratarray = list()
 while j < endyear + 1:
-    NWFZratarray.append(treaty_centrality_dict[j][3,1])
+    NWFZratarray.append(treaty_centrality_rat_dict[j][1,1]) # would be [3,1] for full network
     j=j+1
 
 #get year array for x values
@@ -337,10 +506,33 @@ while j < endyear + 1:
     yeararray.append(j)
     j=j+1
 
-#plot treaty centralities and label the lines
-plt.plot(yeararray,NPTsigarray,'b--',label='NPT Signature')
+# #plot treaty centralities and label the lines for UPR poster (full network)
+# plt.plot(yeararray,NPTsigarray,'b--',label='NPT Signature') #blue dash
+# plt.plot(yeararray,NPTratarray,'b-',label='NPT Ratification') #blue line
+# plt.plot(yeararray,NWFZsigarray,'y--',label='NWFZ Signature') #yellow dash
+# plt.plot(yeararray,NWFZratarray,'y-',label='NWFZ Ratification') #yellow line
+# plt.ylabel('Eigenvector Centrality',fontsize='large')
+# plt.legend(loc=3,fontsize='large')
+
+# plot treaty signature centralities and label the lines
+plt.plot(yeararray,NPTsigarray,'b-',label='NPT Signature')
+plt.plot(yeararray,NWFZsigarray,'y-',label='NWFZ Signature')
+plt.ylabel('Eigenvector Centrality',fontsize='large')
+plt.legend(loc=3,fontsize='large')
+plt.title('Signature Network')
+
+# plot treaty ratification centralities and label the lines
 plt.plot(yeararray,NPTratarray,'b-',label='NPT Ratification')
-plt.plot(yeararray,NWFZsigarray,'y--',label='NWFZ Signature')
 plt.plot(yeararray,NWFZratarray,'y-',label='NWFZ Ratification')
 plt.ylabel('Eigenvector Centrality',fontsize='large')
 plt.legend(loc=3,fontsize='large')
+plt.title('Ratification Network')
+
+# plot world proliferation levels
+j=startyear
+worldproliflist = list()
+while j < endyear + 1:
+    worldproliflist.append(world_prolif_dict[j])
+    j=j+1
+plt.plot(yeararray,worldproliflist,'k-') #black line
+plt.ylabel('Total World Proliferation Levels (Singh & Way)',fontsize='large')
