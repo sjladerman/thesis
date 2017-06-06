@@ -538,12 +538,21 @@ while j < endyear + 1:
 # plt.plot(yeararray,worldproliflist,'k-') #black line
 # plt.ylabel('Total World Proliferation Levels (Singh & Way)',fontsize='large')
 
-# # scatter plot of state centralities against proliferation level
-# # prolif_dict col 0 = ccode, col 1 = year, col 2 = prolif level (int)
-# # country_centrality_sig_dict col 0 = ccode, col 1 = cent (float)
-# # country_centrality_rat_dict col 0 = ccode, col 1 = cent (float)
-# plt.plot(prolif_dict[2000][:,2],country_centrality_sig_dict[2000][:,1],'ko') # 2000, black dots
-# plt.axis([-0.25,3.25,-0.005,0.1])
+# scatter plot of state centralities against proliferation level
+# prolif_dict col 0 = ccode, col 1 = year, col 2 = prolif level (int)
+# country_centrality_sig_dict col 0 = ccode, col 1 = cent (float)
+# country_centrality_rat_dict col 0 = ccode, col 1 = cent (float)
+plt.plot(prolif_dict[1990][:,2],country_centrality_sig_dict[1990][:,1],'ko') # 1975, black dots
+plt.axis([-0.25,3.25,-0.005,0.1])
+plt.ylabel('State Centrality',fontsize='large')
+plt.xlabel('State Proliferation Level', fontsize='large')
+plt.title('Signature Network for 1990')
+
+plt.plot(prolif_dict[1990][:,2],country_centrality_rat_dict[1990][:,1],'ko') # 1975, black dots
+plt.axis([-0.25,3.25,-0.005,0.1])
+plt.ylabel('State Centrality',fontsize='large')
+plt.xlabel('State Proliferation Level', fontsize='large')
+plt.title('Ratification Network for 1990')
 
 # store sig ratification by state
 prolif_level_dict_bycountry = {}
@@ -569,14 +578,14 @@ for country in countryKey_array[:,0]:
     sig_cent_dict_bycountry[country] = cent_sig
     rat_cent_dict_bycountry[country] = cent_rat
 
-# scatter plot of a country's sig cent & prolif throughout time
-plt.plot(yeararray,prolif_level_dict_bycountry[560],'b-',label='Proliferation Level')
-plt.plot(yeararray,sig_cent_dict_bycountry[560],'ko',label='Signature Centrality')
-plt.legend(loc=3,fontsize='large')
-plt.title('South Africa Signature Network')
+# # scatter plot of a country's sig cent & prolif throughout time
+# plt.plot(yeararray,prolif_level_dict_bycountry[560],'b-',label='Proliferation Level')
+# plt.plot(yeararray,sig_cent_dict_bycountry[560],'ko',label='Signature Centrality')
+# plt.legend(loc=3,fontsize='large')
+# plt.title('South Africa Signature Network')
 
-# scatter plot of a country's rat cent & prolif throughout time
-plt.plot(yeararray,prolif_level_dict_bycountry[560],'b-',label='Proliferation Level')
-plt.plot(yeararray,rat_cent_dict_bycountry[560],'ko',label='Ratification Centrality')
-plt.legend(loc=3,fontsize='large')
-plt.title('South Africa Ratification Network')
+# # scatter plot of a country's rat cent & prolif throughout time
+# plt.plot(yeararray,prolif_level_dict_bycountry[560],'b-',label='Proliferation Level')
+# plt.plot(yeararray,rat_cent_dict_bycountry[560],'ko',label='Ratification Centrality')
+# plt.legend(loc=3,fontsize='large')
+# plt.title('South Africa Ratification Network')
