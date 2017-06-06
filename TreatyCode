@@ -111,6 +111,7 @@ prolif_array = np.append(prolif_array,prolif90s_array,axis=0)
 
 #read in the country and treaty keys
 countryKey = pd.read_excel("TreatyData '45-'49 v1.xlsx", sheetname="CountryKey")
+countryKey_array = countryKey.as_matrix()
 treatyKey = pd.read_excel("TreatyData '45-'49 v1.xlsx", sheetname="TreatyKey")
 
 #start and end years
@@ -514,25 +515,68 @@ while j < endyear + 1:
 # plt.ylabel('Eigenvector Centrality',fontsize='large')
 # plt.legend(loc=3,fontsize='large')
 
-# plot treaty signature centralities and label the lines
-plt.plot(yeararray,NPTsigarray,'b-',label='NPT Signature')
-plt.plot(yeararray,NWFZsigarray,'y-',label='NWFZ Signature')
-plt.ylabel('Eigenvector Centrality',fontsize='large')
-plt.legend(loc=3,fontsize='large')
-plt.title('Signature Network')
+# # plot treaty signature centralities and label the lines
+# plt.plot(yeararray,NPTsigarray,'b-',label='NPT Signature')
+# plt.plot(yeararray,NWFZsigarray,'y-',label='NWFZ Signature')
+# plt.ylabel('Eigenvector Centrality',fontsize='large')
+# plt.legend(loc=3,fontsize='large')
+# plt.title('Signature Network')
 
-# plot treaty ratification centralities and label the lines
-plt.plot(yeararray,NPTratarray,'b-',label='NPT Ratification')
-plt.plot(yeararray,NWFZratarray,'y-',label='NWFZ Ratification')
-plt.ylabel('Eigenvector Centrality',fontsize='large')
-plt.legend(loc=3,fontsize='large')
-plt.title('Ratification Network')
+# # plot treaty ratification centralities and label the lines
+# plt.plot(yeararray,NPTratarray,'b-',label='NPT Ratification')
+# plt.plot(yeararray,NWFZratarray,'y-',label='NWFZ Ratification')
+# plt.ylabel('Eigenvector Centrality',fontsize='large')
+# plt.legend(loc=3,fontsize='large')
+# plt.title('Ratification Network')
 
-# plot world proliferation levels
-j=startyear
-worldproliflist = list()
-while j < endyear + 1:
-    worldproliflist.append(world_prolif_dict[j])
-    j=j+1
-plt.plot(yeararray,worldproliflist,'k-') #black line
-plt.ylabel('Total World Proliferation Levels (Singh & Way)',fontsize='large')
+# # plot world proliferation levels
+# j=startyear
+# worldproliflist = list()
+# while j < endyear + 1:
+#     worldproliflist.append(world_prolif_dict[j])
+#     j=j+1
+# plt.plot(yeararray,worldproliflist,'k-') #black line
+# plt.ylabel('Total World Proliferation Levels (Singh & Way)',fontsize='large')
+
+# # scatter plot of state centralities against proliferation level
+# # prolif_dict col 0 = ccode, col 1 = year, col 2 = prolif level (int)
+# # country_centrality_sig_dict col 0 = ccode, col 1 = cent (float)
+# # country_centrality_rat_dict col 0 = ccode, col 1 = cent (float)
+# plt.plot(prolif_dict[2000][:,2],country_centrality_sig_dict[2000][:,1],'ko') # 2000, black dots
+# plt.axis([-0.25,3.25,-0.005,0.1])
+
+# store sig ratification by state
+prolif_level_dict_bycountry = {}
+sig_cent_dict_bycountry = {}
+rat_cent_dict_bycountry = {}
+for country in countryKey_array[:,0]:
+    j=startyear
+    prolif = list()
+    cent_sig = list()
+    cent_rat = list()
+    while j < endyear + 1:
+        y = np.argwhere(prolif_dict[j][:,0]==country)
+        if len(y) == 1:
+            prolif.append(int(prolif_dict[j][y,2]))
+            y = np.argwhere(country_centrality_sig_dict[j][:,0]==country)
+            if len(y) == 1:
+                cent_sig.append(float(country_centrality_sig_dict[j][y,1]))
+                y = np.argwhere(country_centrality_rat_dict[j][:,0]==country)
+                if len(y) == 1:
+                    cent_rat.append(float(country_centrality_rat_dict[j][y,1]))
+        j=j+1
+    prolif_level_dict_bycountry[country] = prolif
+    sig_cent_dict_bycountry[country] = cent_sig
+    rat_cent_dict_bycountry[country] = cent_rat
+
+# scatter plot of a country's sig cent & prolif throughout time
+plt.plot(yeararray,prolif_level_dict_bycountry[560],'b-',label='Proliferation Level')
+plt.plot(yeararray,sig_cent_dict_bycountry[560],'ko',label='Signature Centrality')
+plt.legend(loc=3,fontsize='large')
+plt.title('South Africa Signature Network')
+
+# scatter plot of a country's rat cent & prolif throughout time
+plt.plot(yeararray,prolif_level_dict_bycountry[560],'b-',label='Proliferation Level')
+plt.plot(yeararray,rat_cent_dict_bycountry[560],'ko',label='Ratification Centrality')
+plt.legend(loc=3,fontsize='large')
+plt.title('South Africa Ratification Network')
