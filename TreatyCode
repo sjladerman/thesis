@@ -3,6 +3,7 @@ import pandas as pd
 import math
 from numpy import linalg
 import matplotlib.pyplot as plt
+from scipy.stats.stats import pearsonr
 
 # TREATY ARRAY CREATION
 
@@ -578,6 +579,12 @@ for country in countryKey_array[:,0]:
     sig_cent_dict_bycountry[country] = cent_sig
     rat_cent_dict_bycountry[country] = cent_rat
 
+# scatter plot of state proliferation level against centrality by year
+plt.plot(prolif_level_dict_bycountry[560],sig_cent_dict_bycountry[560],'ko')
+plt.ylabel('State Centrality by Year',fontsize='large')
+plt.xlabel('Proliferation Level by Year', fontsize='large')
+plt.title('South Africa Signature Network')
+
 # # scatter plot of a country's sig cent & prolif throughout time
 # plt.plot(yeararray,prolif_level_dict_bycountry[560],'b-',label='Proliferation Level')
 # plt.plot(yeararray,sig_cent_dict_bycountry[560],'ko',label='Signature Centrality')
@@ -589,3 +596,154 @@ for country in countryKey_array[:,0]:
 # plt.plot(yeararray,rat_cent_dict_bycountry[560],'ko',label='Ratification Centrality')
 # plt.legend(loc=3,fontsize='large')
 # plt.title('South Africa Ratification Network')
+
+
+# CORRELATIONS
+
+
+# Pearson correlation
+# (x,y) in and (Pearson's correlation coefficent,2-tailed p-value) out
+
+# save dictionary of correlations for each year of proliferation levels of all states
+# vs. centrality levels of all states RATIFICATION NETWORK
+j = startyear
+corr_yearly_dict_rat = {}
+pvalue_yearly_dict_rat = {}
+while j < endyear + 1:
+    y = pearsonr(prolif_dict[j][:,2],country_centrality_rat_dict[j][:,1])
+    corr_yearly_dict_rat[j] = y[0]
+    pvalue_yearly_dict_rat[j] = y[1]
+    j=j+1
+
+j=startyear
+corr_yearly_array_rat = list()
+while j < endyear + 1:
+    corr_yearly_array_rat.append(corr_yearly_dict_rat[j])
+    j=j+1
+
+# save dictionary of correlations for each year of proliferation levels of all states
+# vs. centrality levels of all states SIGNATURE NETWORK
+j = startyear
+corr_yearly_dict_sig = {}
+pvalue_yearly_dict_sig = {}
+while j < endyear + 1:
+    y = pearsonr(prolif_dict[j][:,2],country_centrality_sig_dict[j][:,1])
+    corr_yearly_dict_sig[j] = y[0]
+    pvalue_yearly_dict_sig[j] = y[1]
+    j=j+1
+
+j=startyear
+corr_yearly_array_sig = list()
+while j < endyear + 1:
+    corr_yearly_array_sig.append(corr_yearly_dict_sig[j])
+    j=j+1
+
+# plot both signature and ratification correlations
+plt.plot(yeararray,corr_yearly_array_rat,'ko',label='Ratification Correlation')
+plt.plot(yeararray,corr_yearly_array_sig,'bo',label='Signature Correlation')
+plt.legend(loc=3,fontsize='large')
+plt.title('Yearly Correlation Values')
+# both sig and rat look the same
+
+
+# save dictionary of correlations for state of proliferation levels of all years
+# vs. centrality levels of all years RATIFICATION NETWORK
+corr_state_dict_rat = {}
+pvalue_state_dict_rat = {}
+for country in countryKey_array[:,0]:
+    y = pearsonr(prolif_level_dict_bycountry[country],rat_cent_dict_bycountry[country])
+    corr_state_dict_rat[country] = y[0]
+    pvalue_state_dict_rat[country] = y[1]
+
+corr_state_array_rat = list()
+for country in countryKey_array[:,0]:
+    if corr_state_dict_rat[country] != corr_state_dict_rat[country]:
+        corr_state_dict_rat[country] = 0
+    corr_state_array_rat.append(corr_state_dict_rat[country])
+
+# save dictionary of correlations for state of proliferation levels of all years
+# vs. centrality levels of all years SIGNATURE NETWORK
+corr_state_dict_sig = {}
+pvalue_state_dict_sig = {}
+for country in countryKey_array[:,0]:
+    y = pearsonr(prolif_level_dict_bycountry[country],sig_cent_dict_bycountry[country])
+    corr_state_dict_sig[country] = y[0]
+    pvalue_state_dict_sig[country] = y[1]
+
+corr_state_array_sig = list()
+for country in countryKey_array[:,0]:
+    if corr_state_dict_sig[country] != corr_state_dict_sig[country]:
+        corr_state_dict_sig[country] = 0
+    corr_state_array_sig.append(corr_state_dict_sig[country])
+
+plt.plot(countryKey_array[:,0],corr_state_array_rat,'ko',label='Ratification Correlation')
+plt.plot(countryKey_array[:,0],corr_state_array_sig,'bo',label='Signature Correlation')
+plt.legend(loc=3,fontsize='large')
+plt.title('Correlation Values by State')
+
+
+# # COMEMBERSHIP VALUES / NO CORRELATION SO THEY ARE COMMENTED OUT
+#
+# # storing comembership values in array RATIFICATION NETWORK
+# j = startyear
+# comember_rat_values_dict = {}
+# while j < endyear + 1:
+#     # checking to make sure they are equal
+#     if com_actor_rat_dict[j][0,1] == com_actor_rat_dict[j][1,0]:
+#         comember_rat_values_dict[j] = com_actor_rat_dict[j][0,1]
+#     else:
+#         comember_rat_values_dict[j] = 'not equal'
+#     j=j+1
+#
+# # correlating comembership values with proliferation levels by year RATIFICATION NETWORK
+# j = startyear
+# corr_com_dict_rat = {}
+# pvalue_com_dict_rat = {}
+# while j < endyear + 1:
+#     y = pearsonr(prolif_dict[j][:,2],comember_rat_values_dict[j])
+#     corr_com_dict_rat[j] = y[0]
+#     pvalue_com_dict_rat[j] = y[1]
+#     j=j+1
+# # NO CORRELATION
+#
+# # getting array for comembership correlation RATIFICATION NETWORK
+# j=startyear
+# corr_com_array_rat = list()
+# while j < endyear + 1:
+#     corr_com_array_rat.append(corr_com_dict_rat[j])
+#     j=j+1
+#
+# # storing comembership values in array SIGNATURE NETWORK
+# j = startyear
+# comember_sig_values_dict = {}
+# while j < endyear + 1:
+#     # checking to make sure they are equal
+#     if com_actor_sig_dict[j][0,1] == com_actor_sig_dict[j][1,0]:
+#         comember_sig_values_dict[j] = com_actor_sig_dict[j][0,1]
+#     else:
+#         comember_sig_values_dict[j] = 'not equal'
+#     j=j+1
+#
+# # correlating comembership values with proliferation levels by year SIGNATURE NETWORK
+# j = startyear
+# corr_com_dict_sig = {}
+# pvalue_com_dict_sig = {}
+# while j < endyear + 1:
+#     y = pearsonr(prolif_dict[j][:,2],comember_sig_values_dict[j])
+#     corr_com_dict_sig[j] = y[0]
+#     pvalue_com_dict_sig[j] = y[1]
+#     j=j+1
+# # NO CORRELATION
+#
+# # getting array for comembership correlation SIGNATURE NETWORK
+# j=startyear
+# corr_com_array_sig = list()
+# while j < endyear + 1:
+#     corr_com_array_sig.append(corr_com_dict_sig[j])
+#     j=j+1
+#
+# # plot comembership correlations
+# plt.plot(yeararray,corr_com_array_rat,'ko',label='Ratification Correlation')
+# #plt.plot(yeararray,corr_com_array_sig,'bo',label='Signature Correlation')
+# plt.legend(loc=3,fontsize='large')
+# plt.title('Comembership Yearly Correlation Values')
