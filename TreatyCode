@@ -604,13 +604,15 @@ plt.title('South Africa Signature Network')
 # Pearson correlation
 # (x,y) in and (Pearson's correlation coefficent,2-tailed p-value) out
 
+# CORRELATION OF STATE CENTRALITY AND PROLIF LEVEL BY YEAR
+
 # save dictionary of correlations for each year of proliferation levels of all states
 # vs. centrality levels of all states RATIFICATION NETWORK
 j = startyear
 corr_yearly_dict_rat = {}
 pvalue_yearly_dict_rat = {}
 while j < endyear + 1:
-    y = pearsonr(prolif_dict[j][:,2],country_centrality_rat_dict[j][:,1])
+    y = pearsonr(country_centrality_rat_dict[j][:,1],prolif_dict[j][:,2])
     corr_yearly_dict_rat[j] = y[0]
     pvalue_yearly_dict_rat[j] = y[1]
     j=j+1
@@ -627,7 +629,7 @@ j = startyear
 corr_yearly_dict_sig = {}
 pvalue_yearly_dict_sig = {}
 while j < endyear + 1:
-    y = pearsonr(prolif_dict[j][:,2],country_centrality_sig_dict[j][:,1])
+    y = pearsonr(country_centrality_sig_dict[j][:,1],prolif_dict[j][:,2])
     corr_yearly_dict_sig[j] = y[0]
     pvalue_yearly_dict_sig[j] = y[1]
     j=j+1
@@ -643,15 +645,48 @@ plt.plot(yeararray,corr_yearly_array_rat,'ko',label='Ratification Correlation')
 plt.plot(yeararray,corr_yearly_array_sig,'bo',label='Signature Correlation')
 plt.legend(loc=3,fontsize='large')
 plt.title('Yearly Correlation Values')
-# both sig and rat look the same
 
+# CORRELATION OF TREATY CENTRALITY AND PROLIF LEVELS
+
+j=startyear
+worldproliflist = list()
+while j < endyear + 1:
+    worldproliflist.append(world_prolif_dict[j])
+    j=j+1
+
+z = pearsonr(NPTratarray,worldproliflist)
+NPTrat_corr = z[0]
+NPTrat_pvalue = z[1]
+
+z = pearsonr(NPTsigarray,worldproliflist)
+NPTsig_corr = z[0]
+NPTsig_pvalue = z[1]
+
+z = pearsonr(NWFZratarray,worldproliflist)
+NWFZrat_corr = z[0]
+NWFZrat_pvalue = z[1]
+
+z = pearsonr(NWFZsigarray,worldproliflist)
+NWFZsig_corr = z[0]
+NWFZsig_pvalue = z[1]
+
+print('NPT Ratification Correlation: ', NPTrat_corr)
+print('NPT Ratification p-value: ', NPTrat_pvalue)
+print('NPT Signature Correlation: ', NPTsig_corr)
+print('NPT Signature p-value: ', NPTsig_pvalue)
+print('NWFZ Ratification Correlation: ', NWFZrat_corr)
+print('NWFZ Ratification p-value: ', NWFZrat_pvalue)
+print('NWFZ Signature Correlation: ', NWFZsig_corr)
+print('NWFZ Signature p-value: ', NWFZsig_pvalue)
+
+# CORRELATION OF STATE CENTRALITY AND PROLIF LEVELS BY STATE (not super good)
 
 # save dictionary of correlations for state of proliferation levels of all years
 # vs. centrality levels of all years RATIFICATION NETWORK
 corr_state_dict_rat = {}
 pvalue_state_dict_rat = {}
 for country in countryKey_array[:,0]:
-    y = pearsonr(prolif_level_dict_bycountry[country],rat_cent_dict_bycountry[country])
+    y = pearsonr(rat_cent_dict_bycountry[country],prolif_level_dict_bycountry[country])
     corr_state_dict_rat[country] = y[0]
     pvalue_state_dict_rat[country] = y[1]
 
@@ -666,7 +701,7 @@ for country in countryKey_array[:,0]:
 corr_state_dict_sig = {}
 pvalue_state_dict_sig = {}
 for country in countryKey_array[:,0]:
-    y = pearsonr(prolif_level_dict_bycountry[country],sig_cent_dict_bycountry[country])
+    y = pearsonr(sig_cent_dict_bycountry[country],prolif_level_dict_bycountry[country])
     corr_state_dict_sig[country] = y[0]
     pvalue_state_dict_sig[country] = y[1]
 
@@ -681,7 +716,7 @@ plt.plot(countryKey_array[:,0],corr_state_array_sig,'bo',label='Signature Correl
 plt.legend(loc=3,fontsize='large')
 plt.title('Correlation Values by State')
 
-
+# FIX THIS SHIT BELOW!!
 # # COMEMBERSHIP VALUES / NO CORRELATION SO THEY ARE COMMENTED OUT
 #
 # # storing comembership values in array RATIFICATION NETWORK
