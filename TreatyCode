@@ -5,7 +5,57 @@ from numpy import linalg
 import matplotlib.pyplot as plt
 from scipy.stats.stats import pearsonr
 
-# TREATY ARRAY CREATION
+# with or without NWS in calculations (NWS will stay in global proliferation levels)
+# set equal to 1 to remove from calcs, 0 otherwise
+no_NWS = 0
+
+#start and end years
+startyear = 1945
+endyear = 2000
+
+# ARRAY CREATION
+
+#read in the country, year, proliferation level info from excel to pandas to single numpy array
+prolif40s = pd.read_excel("TreatyData '45-'49 v1.xlsx", sheetname="ProliferationLevel")
+prolif40s_array = prolif40s.as_matrix()
+prolif50s = pd.read_excel("TreatyData '50-'59 v1.xlsx", sheetname="ProliferationLevel")
+prolif50s_array = prolif50s.as_matrix()
+prolif60s = pd.read_excel("TreatyData '60-'69 v1.xlsx", sheetname="ProliferationLevel")
+prolif60s_array = prolif60s.as_matrix()
+prolif70s = pd.read_excel("TreatyData '70-'79 v1.xlsx", sheetname="ProliferationLevel")
+prolif70s_array = prolif70s.as_matrix()
+prolif80s = pd.read_excel("TreatyData '80-'89 v1.xlsx", sheetname="ProliferationLevel")
+prolif80s_array = prolif80s.as_matrix()
+prolif90s = pd.read_excel("TreatyData '90-'00 v1.xlsx", sheetname="ProliferationLevel")
+prolif90s_array = prolif90s.as_matrix()
+prolif_array = np.append(prolif40s_array,prolif50s_array,axis=0)
+prolif_array = np.append(prolif_array,prolif60s_array,axis=0)
+prolif_array = np.append(prolif_array,prolif70s_array,axis=0)
+prolif_array = np.append(prolif_array,prolif80s_array,axis=0)
+prolif_array = np.append(prolif_array,prolif90s_array,axis=0)
+
+# calculate world proliferation totals (with NWS no matter what) and store that in a dictionary
+j = startyear
+world_prolif_dict = {}
+while j < endyear + 1:
+    variable = np.empty((0,3), dtype="int")
+    i=0
+    while i < len(prolif_array):
+        if prolif_array[i,1]==j:
+            variable = np.vstack([variable,prolif_array[i]])
+        i=i+1
+    # now calculating the sum of proliferation levels and adding that to a new dict
+    sum_array = np.sum(variable,axis=0)
+    world_prolif_dict[j] = sum_array[2]
+    j=j+1
+
+# set up boolean mask to determine NWS & remove NWS from prolif_array
+if no_NWS == 1:
+    NWSbool = np.equal(prolif_array[:,2],3)
+    NWSarray = NWSbool.astype(int)
+    NWSarray = np.reshape(NWSarray,(len(NWSarray),1))
+    NWSindex = np.nonzero(NWSarray)
+    prolif_array = np.delete(prolif_array,NWSindex,0)
 
 #read in the country, year, NPT, NWFZ info from excel to pandas to single numpy array
 #col 0 = ccode, col 1 = year, col 2 = NPT (0,1,2), col 3 = NWFZ (0,1,2)
@@ -26,6 +76,10 @@ treaty_array = np.append(treaty_array,treaty60s_array,axis=0)
 treaty_array = np.append(treaty_array,treaty70s_array,axis=0)
 treaty_array = np.append(treaty_array,treaty80s_array,axis=0)
 treaty_array = np.append(treaty_array,treaty90s_array,axis=0)
+
+# remove NWS from treaty_array
+if no_NWS == 1:
+    treaty_array = np.delete(treaty_array,NWSindex,0)
 
 #this section separates out NPT signatures and ratifications
 #col 4 = NPT sign, col 5 = NPT ratify
@@ -49,7 +103,6 @@ NWFZratColumn = np.reshape(NWFZratColumn,(len(NWFZratColumn),1))
 treaty_array = np.concatenate((treaty_array,NWFZsigColumn),axis=1)
 treaty_array = np.concatenate((treaty_array,NWFZratColumn),axis=1)
 
-
 #read in the country, year, country normalization info from excel to pandas to single numpy array
 cNormal40s = pd.read_excel("TreatyData '45-'49 v1.xlsx", sheetname="CountryNormalization")
 cNormal40s_array = cNormal40s.as_matrix()
@@ -71,6 +124,10 @@ cNormal_array = np.append(cNormal_array,cNormal90s_array,axis=0)
 # for separate networks, need to divide the last column by 2
 cNormal_array[:,2] = cNormal_array[:,2] / 2
 
+# remove NWS from cNormal_array
+if no_NWS == 1:
+    cNormal_array = np.delete(cNormal_array,NWSindex,0)
+
 #read in the treaty, year, treaty normalization info from excel to pandas to single numpy array
 tNormal40s = pd.read_excel("TreatyData '45-'49 v1.xlsx", sheetname="TreatyNormalization")
 tNormal40s_array = tNormal40s.as_matrix()
@@ -90,34 +147,10 @@ tNormal_array = np.append(tNormal_array,tNormal70s_array,axis=0)
 tNormal_array = np.append(tNormal_array,tNormal80s_array,axis=0)
 tNormal_array = np.append(tNormal_array,tNormal90s_array,axis=0)
 
-
-#read in the country, year, proliferation level info from excel to pandas to single numpy array
-prolif40s = pd.read_excel("TreatyData '45-'49 v1.xlsx", sheetname="ProliferationLevel")
-prolif40s_array = prolif40s.as_matrix()
-prolif50s = pd.read_excel("TreatyData '50-'59 v1.xlsx", sheetname="ProliferationLevel")
-prolif50s_array = prolif50s.as_matrix()
-prolif60s = pd.read_excel("TreatyData '60-'69 v1.xlsx", sheetname="ProliferationLevel")
-prolif60s_array = prolif60s.as_matrix()
-prolif70s = pd.read_excel("TreatyData '70-'79 v1.xlsx", sheetname="ProliferationLevel")
-prolif70s_array = prolif70s.as_matrix()
-prolif80s = pd.read_excel("TreatyData '80-'89 v1.xlsx", sheetname="ProliferationLevel")
-prolif80s_array = prolif80s.as_matrix()
-prolif90s = pd.read_excel("TreatyData '90-'00 v1.xlsx", sheetname="ProliferationLevel")
-prolif90s_array = prolif90s.as_matrix()
-prolif_array = np.append(prolif40s_array,prolif50s_array,axis=0)
-prolif_array = np.append(prolif_array,prolif60s_array,axis=0)
-prolif_array = np.append(prolif_array,prolif70s_array,axis=0)
-prolif_array = np.append(prolif_array,prolif80s_array,axis=0)
-prolif_array = np.append(prolif_array,prolif90s_array,axis=0)
-
 #read in the country and treaty keys
 countryKey = pd.read_excel("TreatyData '45-'49 v1.xlsx", sheetname="CountryKey")
 countryKey_array = countryKey.as_matrix()
 treatyKey = pd.read_excel("TreatyData '45-'49 v1.xlsx", sheetname="TreatyKey")
-
-#start and end years
-startyear = 1945
-endyear = 2000
 
 #cycle through country normalizations to get matrices by year and store in a dictionary
 j = startyear
@@ -149,10 +182,8 @@ while j < endyear + 1:
     j=j+1
 
 # cycle through proliferation levels to get matrices by year and store in a dictionary
-# also calculating world proliferation total and storing that in another dictionary
 j = startyear
 prolif_dict = {}
-world_prolif_dict = {}
 while j < endyear + 1:
     variable = np.empty((0,3), dtype="int")
     i=0
@@ -161,9 +192,6 @@ while j < endyear + 1:
             variable = np.vstack([variable,prolif_array[i]])
         i=i+1
     prolif_dict[j]=variable
-    # now calculating the sum of proliferation levels and adding that to a new dict
-    sum_array = np.sum(variable,axis=0)
-    world_prolif_dict[j] = sum_array[2]
     j=j+1
 
 
@@ -539,21 +567,21 @@ while j < endyear + 1:
 # plt.plot(yeararray,worldproliflist,'k-') #black line
 # plt.ylabel('Total World Proliferation Levels (Singh & Way)',fontsize='large')
 
-# scatter plot of state centralities against proliferation level
-# prolif_dict col 0 = ccode, col 1 = year, col 2 = prolif level (int)
-# country_centrality_sig_dict col 0 = ccode, col 1 = cent (float)
-# country_centrality_rat_dict col 0 = ccode, col 1 = cent (float)
-plt.plot(prolif_dict[1990][:,2],country_centrality_sig_dict[1990][:,1],'ko') # 1975, black dots
-plt.axis([-0.25,3.25,-0.005,0.1])
-plt.ylabel('State Centrality',fontsize='large')
-plt.xlabel('State Proliferation Level', fontsize='large')
-plt.title('Signature Network for 1990')
-
-plt.plot(prolif_dict[1990][:,2],country_centrality_rat_dict[1990][:,1],'ko') # 1975, black dots
-plt.axis([-0.25,3.25,-0.005,0.1])
-plt.ylabel('State Centrality',fontsize='large')
-plt.xlabel('State Proliferation Level', fontsize='large')
-plt.title('Ratification Network for 1990')
+# # scatter plot of state centralities against proliferation level
+# # prolif_dict col 0 = ccode, col 1 = year, col 2 = prolif level (int)
+# # country_centrality_sig_dict col 0 = ccode, col 1 = cent (float)
+# # country_centrality_rat_dict col 0 = ccode, col 1 = cent (float)
+# plt.plot(prolif_dict[1990][:,2],country_centrality_sig_dict[1990][:,1],'ko') # 1975, black dots
+# plt.axis([-0.25,3.25,-0.005,0.1])
+# plt.ylabel('State Centrality',fontsize='large')
+# plt.xlabel('State Proliferation Level', fontsize='large')
+# plt.title('Signature Network for 1990')
+#
+# plt.plot(prolif_dict[1990][:,2],country_centrality_rat_dict[1990][:,1],'ko') # 1975, black dots
+# plt.axis([-0.25,3.25,-0.005,0.1])
+# plt.ylabel('State Centrality',fontsize='large')
+# plt.xlabel('State Proliferation Level', fontsize='large')
+# plt.title('Ratification Network for 1990')
 
 # store sig ratification by state
 prolif_level_dict_bycountry = {}
@@ -579,11 +607,11 @@ for country in countryKey_array[:,0]:
     sig_cent_dict_bycountry[country] = cent_sig
     rat_cent_dict_bycountry[country] = cent_rat
 
-# scatter plot of state proliferation level against centrality by year
-plt.plot(prolif_level_dict_bycountry[560],sig_cent_dict_bycountry[560],'ko')
-plt.ylabel('State Centrality by Year',fontsize='large')
-plt.xlabel('Proliferation Level by Year', fontsize='large')
-plt.title('South Africa Signature Network')
+# # scatter plot of state proliferation level against centrality by year
+# plt.plot(prolif_level_dict_bycountry[560],sig_cent_dict_bycountry[560],'ko')
+# plt.ylabel('State Centrality by Year',fontsize='large')
+# plt.xlabel('Proliferation Level by Year', fontsize='large')
+# plt.title('South Africa Signature Network')
 
 # # scatter plot of a country's sig cent & prolif throughout time
 # plt.plot(yeararray,prolif_level_dict_bycountry[560],'b-',label='Proliferation Level')
@@ -679,106 +707,95 @@ print('NWFZ Ratification p-value: ', NWFZrat_pvalue)
 print('NWFZ Signature Correlation: ', NWFZsig_corr)
 print('NWFZ Signature p-value: ', NWFZsig_pvalue)
 
-# CORRELATION OF STATE CENTRALITY AND PROLIF LEVELS BY STATE (not super good)
-
-# save dictionary of correlations for state of proliferation levels of all years
-# vs. centrality levels of all years RATIFICATION NETWORK
-corr_state_dict_rat = {}
-pvalue_state_dict_rat = {}
-for country in countryKey_array[:,0]:
-    y = pearsonr(rat_cent_dict_bycountry[country],prolif_level_dict_bycountry[country])
-    corr_state_dict_rat[country] = y[0]
-    pvalue_state_dict_rat[country] = y[1]
-
-corr_state_array_rat = list()
-for country in countryKey_array[:,0]:
-    if corr_state_dict_rat[country] != corr_state_dict_rat[country]:
-        corr_state_dict_rat[country] = 0
-    corr_state_array_rat.append(corr_state_dict_rat[country])
-
-# save dictionary of correlations for state of proliferation levels of all years
-# vs. centrality levels of all years SIGNATURE NETWORK
-corr_state_dict_sig = {}
-pvalue_state_dict_sig = {}
-for country in countryKey_array[:,0]:
-    y = pearsonr(sig_cent_dict_bycountry[country],prolif_level_dict_bycountry[country])
-    corr_state_dict_sig[country] = y[0]
-    pvalue_state_dict_sig[country] = y[1]
-
-corr_state_array_sig = list()
-for country in countryKey_array[:,0]:
-    if corr_state_dict_sig[country] != corr_state_dict_sig[country]:
-        corr_state_dict_sig[country] = 0
-    corr_state_array_sig.append(corr_state_dict_sig[country])
-
-plt.plot(countryKey_array[:,0],corr_state_array_rat,'ko',label='Ratification Correlation')
-plt.plot(countryKey_array[:,0],corr_state_array_sig,'bo',label='Signature Correlation')
-plt.legend(loc=3,fontsize='large')
-plt.title('Correlation Values by State')
-
-# FIX THIS SHIT BELOW!!
-# # COMEMBERSHIP VALUES / NO CORRELATION SO THEY ARE COMMENTED OUT
+# # CORRELATION OF STATE CENTRALITY AND PROLIF LEVELS BY STATE (not super good)
 #
-# # storing comembership values in array RATIFICATION NETWORK
-# j = startyear
-# comember_rat_values_dict = {}
-# while j < endyear + 1:
-#     # checking to make sure they are equal
-#     if com_actor_rat_dict[j][0,1] == com_actor_rat_dict[j][1,0]:
-#         comember_rat_values_dict[j] = com_actor_rat_dict[j][0,1]
-#     else:
-#         comember_rat_values_dict[j] = 'not equal'
-#     j=j+1
+# # save dictionary of correlations for state of proliferation levels of all years
+# # vs. centrality levels of all years RATIFICATION NETWORK
+# corr_state_dict_rat = {}
+# pvalue_state_dict_rat = {}
+# for country in countryKey_array[:,0]:
+#     y = pearsonr(rat_cent_dict_bycountry[country],prolif_level_dict_bycountry[country])
+#     corr_state_dict_rat[country] = y[0]
+#     pvalue_state_dict_rat[country] = y[1]
 #
-# # correlating comembership values with proliferation levels by year RATIFICATION NETWORK
-# j = startyear
-# corr_com_dict_rat = {}
-# pvalue_com_dict_rat = {}
-# while j < endyear + 1:
-#     y = pearsonr(prolif_dict[j][:,2],comember_rat_values_dict[j])
-#     corr_com_dict_rat[j] = y[0]
-#     pvalue_com_dict_rat[j] = y[1]
-#     j=j+1
-# # NO CORRELATION
+# corr_state_array_rat = list()
+# for country in countryKey_array[:,0]:
+#     if corr_state_dict_rat[country] != corr_state_dict_rat[country]:
+#         corr_state_dict_rat[country] = 0
+#     corr_state_array_rat.append(corr_state_dict_rat[country])
 #
-# # getting array for comembership correlation RATIFICATION NETWORK
-# j=startyear
-# corr_com_array_rat = list()
-# while j < endyear + 1:
-#     corr_com_array_rat.append(corr_com_dict_rat[j])
-#     j=j+1
+# # save dictionary of correlations for state of proliferation levels of all years
+# # vs. centrality levels of all years SIGNATURE NETWORK
+# corr_state_dict_sig = {}
+# pvalue_state_dict_sig = {}
+# for country in countryKey_array[:,0]:
+#     y = pearsonr(sig_cent_dict_bycountry[country],prolif_level_dict_bycountry[country])
+#     corr_state_dict_sig[country] = y[0]
+#     pvalue_state_dict_sig[country] = y[1]
 #
-# # storing comembership values in array SIGNATURE NETWORK
-# j = startyear
-# comember_sig_values_dict = {}
-# while j < endyear + 1:
-#     # checking to make sure they are equal
-#     if com_actor_sig_dict[j][0,1] == com_actor_sig_dict[j][1,0]:
-#         comember_sig_values_dict[j] = com_actor_sig_dict[j][0,1]
-#     else:
-#         comember_sig_values_dict[j] = 'not equal'
-#     j=j+1
+# corr_state_array_sig = list()
+# for country in countryKey_array[:,0]:
+#     if corr_state_dict_sig[country] != corr_state_dict_sig[country]:
+#         corr_state_dict_sig[country] = 0
+#     corr_state_array_sig.append(corr_state_dict_sig[country])
 #
-# # correlating comembership values with proliferation levels by year SIGNATURE NETWORK
-# j = startyear
-# corr_com_dict_sig = {}
-# pvalue_com_dict_sig = {}
-# while j < endyear + 1:
-#     y = pearsonr(prolif_dict[j][:,2],comember_sig_values_dict[j])
-#     corr_com_dict_sig[j] = y[0]
-#     pvalue_com_dict_sig[j] = y[1]
-#     j=j+1
-# # NO CORRELATION
-#
-# # getting array for comembership correlation SIGNATURE NETWORK
-# j=startyear
-# corr_com_array_sig = list()
-# while j < endyear + 1:
-#     corr_com_array_sig.append(corr_com_dict_sig[j])
-#     j=j+1
-#
-# # plot comembership correlations
-# plt.plot(yeararray,corr_com_array_rat,'ko',label='Ratification Correlation')
-# #plt.plot(yeararray,corr_com_array_sig,'bo',label='Signature Correlation')
+# plt.plot(countryKey_array[:,0],corr_state_array_rat,'ko',label='Ratification Correlation')
+# plt.plot(countryKey_array[:,0],corr_state_array_sig,'bo',label='Signature Correlation')
 # plt.legend(loc=3,fontsize='large')
-# plt.title('Comembership Yearly Correlation Values')
+# plt.title('Correlation Values by State')
+
+
+# COMEMBERSHIP VALUES
+
+# storing comembership values in array RATIFICATION NETWORK
+j = startyear
+comember_rat_values_dict = {}
+while j < endyear + 1:
+    # checking to make sure they are equal
+    if com_actor_rat_dict[j][0,1] == com_actor_rat_dict[j][1,0]:
+        comember_rat_values_dict[j] = com_actor_rat_dict[j][0,1]
+    else:
+        comember_rat_values_dict[j] = 'not equal'
+    j=j+1
+
+# make list of comembership values for RATIFICATION NETWORK
+j=startyear
+comember_rat_list = list()
+while j < endyear + 1:
+    comember_rat_list.append(comember_rat_values_dict[j])
+    j=j+1
+
+# storing comembership values in array SIGNATURE NETWORK
+j = startyear
+comember_sig_values_dict = {}
+while j < endyear + 1:
+    # checking to make sure they are equal
+    if com_actor_sig_dict[j][0,1] == com_actor_sig_dict[j][1,0]:
+        comember_sig_values_dict[j] = com_actor_sig_dict[j][0,1]
+    else:
+        comember_sig_values_dict[j] = 'not equal'
+    j=j+1
+
+# make list of comembership values for SIGNATURE NETWORK
+j=startyear
+comember_sig_list = list()
+while j < endyear + 1:
+    comember_sig_list.append(comember_sig_values_dict[j])
+    j=j+1
+
+# correlating comembership values with global proliferation levels RATIFICATION NETWORK
+j = startyear
+z = pearsonr(worldproliflist,comember_rat_list)
+comember_rat_corr = z[0]
+comember_rat_pvalue = z[1]
+
+# correlating comembership values with global proliferation levels SIGNATURE NETWORK
+j = startyear
+z = pearsonr(worldproliflist,comember_sig_list)
+comember_sig_corr = z[0]
+comember_sig_pvalue = z[1]
+
+print('NPT/NWFZ Common Actors Ratification Correlation: ', comember_rat_corr)
+print('NPT/NWFZ Common Actors Ratification p-value: ', comember_rat_pvalue)
+print('NPT/NWFZ Common Actors Signature Correlation: ', comember_sig_corr)
+print('NPT/NWFZ Common Actors Signature p-value: ', comember_sig_pvalue)
