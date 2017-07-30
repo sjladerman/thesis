@@ -7,7 +7,7 @@ from scipy.stats.stats import pearsonr
 
 # with or without NWS in calculations (NWS will stay in global proliferation levels)
 # set equal to 1 to remove from calcs, 0 otherwise
-no_NWS = 0
+no_NWS = 1
 
 #start and end years
 startyear = 1945
@@ -282,7 +282,6 @@ normal_rat_matrix_dict = {}
 while j < endyear + 1:
     i=0
     variable = np.empty((len(rat_treaty_dict[j]),2)) # the 2 would be a 4 for full network
-    countries = np.empty((len(rat_treaty_dict[j]),1), dtype="int")
     while i < len(rat_treaty_dict[j]):
         h = 0
         while h < 2: # would be < 4 for full network
@@ -543,21 +542,21 @@ while j < endyear + 1:
 # plt.plot(yeararray,NWFZratarray,'y-',label='NWFZ Ratification') #yellow line
 # plt.ylabel('Eigenvector Centrality',fontsize='large')
 # plt.legend(loc=3,fontsize='large')
-
+#
 # # plot treaty signature centralities and label the lines
 # plt.plot(yeararray,NPTsigarray,'b-',label='NPT Signature')
 # plt.plot(yeararray,NWFZsigarray,'y-',label='NWFZ Signature')
 # plt.ylabel('Eigenvector Centrality',fontsize='large')
 # plt.legend(loc=3,fontsize='large')
 # plt.title('Signature Network')
-
+#
 # # plot treaty ratification centralities and label the lines
 # plt.plot(yeararray,NPTratarray,'b-',label='NPT Ratification')
 # plt.plot(yeararray,NWFZratarray,'y-',label='NWFZ Ratification')
 # plt.ylabel('Eigenvector Centrality',fontsize='large')
 # plt.legend(loc=3,fontsize='large')
 # plt.title('Ratification Network')
-
+#
 # # plot world proliferation levels
 # j=startyear
 # worldproliflist = list()
@@ -566,6 +565,7 @@ while j < endyear + 1:
 #     j=j+1
 # plt.plot(yeararray,worldproliflist,'k-') #black line
 # plt.ylabel('Total World Proliferation Levels (Singh & Way)',fontsize='large')
+
 
 # # scatter plot of state centralities against proliferation level
 # # prolif_dict col 0 = ccode, col 1 = year, col 2 = prolif level (int)
@@ -632,6 +632,14 @@ for country in countryKey_array[:,0]:
 # Pearson correlation
 # (x,y) in and (Pearson's correlation coefficent,2-tailed p-value) out
 
+# # checking data to see if it's normal RATIFICATION
+# plt.plot(country_centrality_rat_dict[1985][:,1], 'ko')
+#
+# # checking data to see if it's normal SIGNATURE
+# plt.plot(country_centrality_sig_dict[1975][:,1], 'ko')
+#
+# # data seems fairly normal but pretty concentrated (almost discrete); at least not too skewed
+
 # CORRELATION OF STATE CENTRALITY AND PROLIF LEVEL BY YEAR
 
 # save dictionary of correlations for each year of proliferation levels of all states
@@ -668,11 +676,12 @@ while j < endyear + 1:
     corr_yearly_array_sig.append(corr_yearly_dict_sig[j])
     j=j+1
 
-# plot both signature and ratification correlations
-plt.plot(yeararray,corr_yearly_array_rat,'ko',label='Ratification Correlation')
-plt.plot(yeararray,corr_yearly_array_sig,'bo',label='Signature Correlation')
-plt.legend(loc=3,fontsize='large')
-plt.title('Yearly Correlation Values')
+# # plot both signature and ratification correlations
+# plt.plot(yeararray,corr_yearly_array_rat,'ko',label='Ratification Correlation')
+# plt.plot(yeararray,corr_yearly_array_sig,'bo',label='Signature Correlation')
+# plt.legend(loc=3,fontsize='large')
+# plt.title('Yearly Correlation Values')
+
 
 # CORRELATION OF TREATY CENTRALITY AND PROLIF LEVELS
 
@@ -745,57 +754,222 @@ print('NWFZ Signature p-value: ', NWFZsig_pvalue)
 # plt.title('Correlation Values by State')
 
 
-# COMEMBERSHIP VALUES
+# COMMON ACTOR VALUES
 
-# storing comembership values in array RATIFICATION NETWORK
+# # FOR NORMALIZED DATA
+#
+# # storing common actor values in array RATIFICATION NETWORK
+# j = startyear
+# comactor_rat_values_dict = {}
+# while j < endyear + 1:
+#     # checking to make sure they are equal
+#     if com_actor_rat_dict[j][0,1] == com_actor_rat_dict[j][1,0]:
+#         comactor_rat_values_dict[j] = com_actor_rat_dict[j][0,1]
+#     else:
+#         comactor_rat_values_dict[j] = 'not equal'
+#     j=j+1
+#
+# # make list of common actor values for RATIFICATION NETWORK
+# j=startyear
+# comactor_rat_list = list()
+# while j < endyear + 1:
+#     comactor_rat_list.append(comactor_rat_values_dict[j])
+#     j=j+1
+#
+# # storing common actor values in array SIGNATURE NETWORK
+# j = startyear
+# comactor_sig_values_dict = {}
+# while j < endyear + 1:
+#     # checking to make sure they are equal
+#     if com_actor_sig_dict[j][0,1] == com_actor_sig_dict[j][1,0]:
+#         comactor_sig_values_dict[j] = com_actor_sig_dict[j][0,1]
+#     else:
+#         comactor_sig_values_dict[j] = 'not equal'
+#     j=j+1
+#
+# # make list of common actors values for SIGNATURE NETWORK
+# j=startyear
+# comactor_sig_list = list()
+# while j < endyear + 1:
+#     comactor_sig_list.append(comactor_sig_values_dict[j])
+#     j=j+1
+#
+# # correlating common actors values with global proliferation levels RATIFICATION NETWORK
+# j = startyear
+# z = pearsonr(worldproliflist,comactor_rat_list)
+# comactor_rat_corr = z[0]
+# comactor_rat_pvalue = z[1]
+#
+# # correlating common actors values with global proliferation levels SIGNATURE NETWORK
+# j = startyear
+# z = pearsonr(worldproliflist,comactor_sig_list)
+# comactor_sig_corr = z[0]
+# comactor_sig_pvalue = z[1]
+#
+# print('NPT/NWFZ Common Actors Ratification Correlation: ', comactor_rat_corr)
+# print('NPT/NWFZ Common Actors Ratification p-value: ', comactor_rat_pvalue)
+# print('NPT/NWFZ Common Actors Signature Correlation: ', comactor_sig_corr)
+# print('NPT/NWFZ Common Actors Signature p-value: ', comactor_sig_pvalue)
+
+# FOR RAW DATA
+
+# RATIFICATION NETWORK
+# store affiliation matrix (matrix A) for each year
 j = startyear
-comember_rat_values_dict = {}
+rat_matrix_dict = {}
+while j < endyear + 1:
+    i=0
+    variable = np.empty((len(rat_treaty_dict[j]),2)) # the 2 would be a 4 for full network
+    while i < len(rat_treaty_dict[j]):
+        h = 0
+        while h < 2: # would be < 4 for full network
+            variable[i,h]=rat_treaty_dict[j][i,h+2]
+            h=h+1
+        i=i+1
+    rat_matrix_dict[j]=variable
+    j=j+1
+
+#calculating the transposes of affiliation matrices (matrix A') for each year
+j = startyear
+rat_matrix_dict_t = {}
+while j < endyear + 1:
+    matrix = rat_matrix_dict[j]
+    tmatrix = matrix.transpose()
+    rat_matrix_dict_t[j]=tmatrix
+    j=j+1
+
+#common actors matrix XM for each year
+j = startyear
+comactor_rat_dict = {}
+while j < endyear + 1:
+    matrix = rat_matrix_dict[j]
+    tmatrix = rat_matrix_dict_t[j]
+    comactor_rat_dict[j]=np.dot(tmatrix,matrix)
+    j=j+1
+
+# storing common actor values in array RATIFICATION NETWORK
+j = startyear
+comactor_rat_values_dict = {}
 while j < endyear + 1:
     # checking to make sure they are equal
-    if com_actor_rat_dict[j][0,1] == com_actor_rat_dict[j][1,0]:
-        comember_rat_values_dict[j] = com_actor_rat_dict[j][0,1]
+    if comactor_rat_dict[j][0,1] == comactor_rat_dict[j][1,0]:
+        comactor_rat_values_dict[j] = comactor_rat_dict[j][0,1]
     else:
-        comember_rat_values_dict[j] = 'not equal'
+        comactor_rat_values_dict[j] = 'not equal'
     j=j+1
 
-# make list of comembership values for RATIFICATION NETWORK
+# make list of common actor values for RATIFICATION NETWORK
 j=startyear
-comember_rat_list = list()
+comactor_rat_list = list()
 while j < endyear + 1:
-    comember_rat_list.append(comember_rat_values_dict[j])
+    comactor_rat_list.append(comactor_rat_values_dict[j])
     j=j+1
 
-# storing comembership values in array SIGNATURE NETWORK
+# correlating common actors values with global proliferation levels RATIFICATION NETWORK
+z = pearsonr(worldproliflist,comactor_rat_list)
+comactor_rat_corr = z[0]
+comactor_rat_pvalue = z[1]
+
+print('NPT/NWFZ Common Actors Ratification Correlation: ', comactor_rat_corr)
+print('NPT/NWFZ Common Actors Ratification p-value: ', comactor_rat_pvalue)
+
+# SIGNATURE NETWORK
+# store affiliation matrix (matrix A) for each year
 j = startyear
-comember_sig_values_dict = {}
+sig_matrix_dict = {}
+while j < endyear + 1:
+    i=0
+    variable = np.empty((len(sig_treaty_dict[j]),2)) # the 2 would be a 4 for full network
+    while i < len(sig_treaty_dict[j]):
+        h = 0
+        while h < 2: # would be < 4 for full network
+            variable[i,h]=sig_treaty_dict[j][i,h+2]
+            h=h+1
+        i=i+1
+    sig_matrix_dict[j]=variable
+    j=j+1
+
+#calculating the transposes of affiliation matrices (matrix A') for each year
+j = startyear
+sig_matrix_dict_t = {}
+while j < endyear + 1:
+    matrix = sig_matrix_dict[j]
+    tmatrix = matrix.transpose()
+    sig_matrix_dict_t[j]=tmatrix
+    j=j+1
+
+#common actors matrix XM for each year
+j = startyear
+comactor_sig_dict = {}
+while j < endyear + 1:
+    matrix = sig_matrix_dict[j]
+    tmatrix = sig_matrix_dict_t[j]
+    comactor_sig_dict[j]=np.dot(tmatrix,matrix)
+    j=j+1
+
+# storing common actor values in array SIG
+j = startyear
+comactor_sig_values_dict = {}
 while j < endyear + 1:
     # checking to make sure they are equal
-    if com_actor_sig_dict[j][0,1] == com_actor_sig_dict[j][1,0]:
-        comember_sig_values_dict[j] = com_actor_sig_dict[j][0,1]
+    if comactor_sig_dict[j][0,1] == comactor_sig_dict[j][1,0]:
+        comactor_sig_values_dict[j] = comactor_sig_dict[j][0,1]
     else:
-        comember_sig_values_dict[j] = 'not equal'
+        comactor_sig_values_dict[j] = 'not equal'
     j=j+1
 
-# make list of comembership values for SIGNATURE NETWORK
+# make list of common actor values for SIG
 j=startyear
-comember_sig_list = list()
+comactor_sig_list = list()
 while j < endyear + 1:
-    comember_sig_list.append(comember_sig_values_dict[j])
+    comactor_sig_list.append(comactor_sig_values_dict[j])
     j=j+1
 
-# correlating comembership values with global proliferation levels RATIFICATION NETWORK
-j = startyear
-z = pearsonr(worldproliflist,comember_rat_list)
-comember_rat_corr = z[0]
-comember_rat_pvalue = z[1]
+# correlating common actors values with global proliferation levels SIG
+z = pearsonr(worldproliflist,comactor_sig_list)
+comactor_sig_corr = z[0]
+comactor_sig_pvalue = z[1]
 
-# correlating comembership values with global proliferation levels SIGNATURE NETWORK
-j = startyear
-z = pearsonr(worldproliflist,comember_sig_list)
-comember_sig_corr = z[0]
-comember_sig_pvalue = z[1]
+print('NPT/NWFZ Common Actors Signature Correlation: ', comactor_sig_corr)
+print('NPT/NWFZ Common Actors Signature p-value: ', comactor_sig_pvalue)
 
-print('NPT/NWFZ Common Actors Ratification Correlation: ', comember_rat_corr)
-print('NPT/NWFZ Common Actors Ratification p-value: ', comember_rat_pvalue)
-print('NPT/NWFZ Common Actors Signature Correlation: ', comember_sig_corr)
-print('NPT/NWFZ Common Actors Signature p-value: ', comember_sig_pvalue)
+
+# DENSITY CALCULATIONS (RAW DATA)
+
+# finding the density in each year for both sig and rat networks
+j = startyear
+density_rat_dict = {}
+density_sig_dict = {}
+density_rat_list = list()
+density_sig_list = list()
+while j < endyear + 1:
+    # for RAT
+    z = len(rat_matrix_dict[j])
+    maxTies = z*2
+    ties = sum(sum(rat_matrix_dict[j]))
+    variable = ties/maxTies
+    density_rat_dict[j] = variable
+    density_rat_list.append(variable)
+    # for SIG
+    z = len(sig_matrix_dict[j])
+    maxTies = z*2
+    ties = sum(sum(sig_matrix_dict[j]))
+    variable = ties/maxTies
+    density_sig_dict[j] = variable
+    density_sig_list.append(variable)
+    j = j + 1
+
+# correlate density with global proliferation levels RAT
+z = pearsonr(worldproliflist,density_rat_list)
+density_rat_corr = z[0]
+density_rat_pvalue = z[1]
+print('Ratification Density and Proliferation Correlation: ', density_rat_corr)
+print('Ratification Density and Proliferation p-value: ', density_rat_pvalue)
+
+# correlate density with global proliferation levels SIG
+z = pearsonr(worldproliflist,density_sig_list)
+density_sig_corr = z[0]
+density_sig_pvalue = z[1]
+print('Signature Density and Proliferation Correlation: ', density_sig_corr)
+print('Signature Density and Proliferation p-value: ', density_sig_pvalue)
+
