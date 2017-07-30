@@ -5,7 +5,12 @@ from numpy import linalg
 import matplotlib.pyplot as plt
 from scipy.stats.stats import pearsonr
 
-# with or without NWS in calculations (NWS will stay in global proliferation levels)
+# with or without prolif=3 in calculations (states that acquired will stay in global prolif levels)
+# set equal to 1 to remove from calcs, 0 otherwise
+no_acq = 0
+
+# with or without the NPT NWS in calculations (NWS will stay in global prolif levels)
+# these states are China (710), France (220), Russia (365), UK (200), and US (2)
 # set equal to 1 to remove from calcs, 0 otherwise
 no_NWS = 1
 
@@ -34,7 +39,7 @@ prolif_array = np.append(prolif_array,prolif70s_array,axis=0)
 prolif_array = np.append(prolif_array,prolif80s_array,axis=0)
 prolif_array = np.append(prolif_array,prolif90s_array,axis=0)
 
-# calculate world proliferation totals (with NWS no matter what) and store that in a dictionary
+# calculate world proliferation totals (with NWS/acq no matter what) and store that in a dictionary
 j = startyear
 world_prolif_dict = {}
 while j < endyear + 1:
@@ -49,13 +54,18 @@ while j < endyear + 1:
     world_prolif_dict[j] = sum_array[2]
     j=j+1
 
-# set up boolean mask to determine NWS & remove NWS from prolif_array
+# set up boolean mask to determine acq & remove acq from prolif_array
+if no_acq == 1:
+    acqbool = np.equal(prolif_array[:,2],3)
+    acqarray = acqbool.astype(int)
+    acqarray = np.reshape(acqarray,(len(acqarray),1))
+    acqindex = np.nonzero(acqarray)
+    prolif_array = np.delete(prolif_array,acqindex,0)
+
+# delete China (710), France (220), Russia (365), UK (200), and US (2) from prolif_array
 if no_NWS == 1:
-    NWSbool = np.equal(prolif_array[:,2],3)
-    NWSarray = NWSbool.astype(int)
-    NWSarray = np.reshape(NWSarray,(len(NWSarray),1))
-    NWSindex = np.nonzero(NWSarray)
-    prolif_array = np.delete(prolif_array,NWSindex,0)
+   prolif_array = prolif_array[(prolif_array[:,0] != 2) & (prolif_array[:,0] != 200) & (prolif_array[:,0] != 220) \
+   & (prolif_array[:,0] != 365) & (prolif_array[:,0] != 710)]
 
 #read in the country, year, NPT, NWFZ info from excel to pandas to single numpy array
 #col 0 = ccode, col 1 = year, col 2 = NPT (0,1,2), col 3 = NWFZ (0,1,2)
@@ -78,8 +88,13 @@ treaty_array = np.append(treaty_array,treaty80s_array,axis=0)
 treaty_array = np.append(treaty_array,treaty90s_array,axis=0)
 
 # remove NWS from treaty_array
+if no_acq == 1:
+    treaty_array = np.delete(treaty_array,acqindex,0)
+
+# delete China (710), France (220), Russia (365), UK (200), and US (2) from treaty_array
 if no_NWS == 1:
-    treaty_array = np.delete(treaty_array,NWSindex,0)
+   treaty_array = treaty_array[(treaty_array[:,0] != 2) & (treaty_array[:,0] != 200) & (treaty_array[:,0] != 220) \
+   & (treaty_array[:,0] != 365) & (treaty_array[:,0] != 710)]
 
 #this section separates out NPT signatures and ratifications
 #col 4 = NPT sign, col 5 = NPT ratify
@@ -125,8 +140,13 @@ cNormal_array = np.append(cNormal_array,cNormal90s_array,axis=0)
 cNormal_array[:,2] = cNormal_array[:,2] / 2
 
 # remove NWS from cNormal_array
+if no_acq == 1:
+    cNormal_array = np.delete(cNormal_array,acqindex,0)
+
+# delete China (710), France (220), Russia (365), UK (200), and US (2) from cNormal_array
 if no_NWS == 1:
-    cNormal_array = np.delete(cNormal_array,NWSindex,0)
+   cNormal_array = cNormal_array[(cNormal_array[:,0] != 2) & (cNormal_array[:,0] != 200) & (cNormal_array[:,0] != 220) \
+   & (cNormal_array[:,0] != 365) & (cNormal_array[:,0] != 710)]
 
 #read in the treaty, year, treaty normalization info from excel to pandas to single numpy array
 tNormal40s = pd.read_excel("TreatyData '45-'49 v1.xlsx", sheetname="TreatyNormalization")
@@ -535,21 +555,21 @@ while j < endyear + 1:
     yeararray.append(j)
     j=j+1
 
-# #plot treaty centralities and label the lines for UPR poster (full network)
+# # plot treaty centralities and label the lines for UPR poster (full network)
 # plt.plot(yeararray,NPTsigarray,'b--',label='NPT Signature') #blue dash
 # plt.plot(yeararray,NPTratarray,'b-',label='NPT Ratification') #blue line
 # plt.plot(yeararray,NWFZsigarray,'y--',label='NWFZ Signature') #yellow dash
 # plt.plot(yeararray,NWFZratarray,'y-',label='NWFZ Ratification') #yellow line
 # plt.ylabel('Eigenvector Centrality',fontsize='large')
 # plt.legend(loc=3,fontsize='large')
-#
+
 # # plot treaty signature centralities and label the lines
 # plt.plot(yeararray,NPTsigarray,'b-',label='NPT Signature')
 # plt.plot(yeararray,NWFZsigarray,'y-',label='NWFZ Signature')
 # plt.ylabel('Eigenvector Centrality',fontsize='large')
 # plt.legend(loc=3,fontsize='large')
 # plt.title('Signature Network')
-#
+
 # # plot treaty ratification centralities and label the lines
 # plt.plot(yeararray,NPTratarray,'b-',label='NPT Ratification')
 # plt.plot(yeararray,NWFZratarray,'y-',label='NWFZ Ratification')
@@ -676,11 +696,11 @@ while j < endyear + 1:
     corr_yearly_array_sig.append(corr_yearly_dict_sig[j])
     j=j+1
 
-# # plot both signature and ratification correlations
-# plt.plot(yeararray,corr_yearly_array_rat,'ko',label='Ratification Correlation')
-# plt.plot(yeararray,corr_yearly_array_sig,'bo',label='Signature Correlation')
-# plt.legend(loc=3,fontsize='large')
-# plt.title('Yearly Correlation Values')
+# plot both signature and ratification correlations
+plt.plot(yeararray,corr_yearly_array_rat,'ko',label='Ratification Correlation')
+plt.plot(yeararray,corr_yearly_array_sig,'bo',label='Signature Correlation')
+plt.legend(loc=3,fontsize='large')
+plt.title('Yearly Correlation Values')
 
 
 # CORRELATION OF TREATY CENTRALITY AND PROLIF LEVELS
