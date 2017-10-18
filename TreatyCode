@@ -17,7 +17,7 @@ no_acq = 0
 no_NWS = 1
 
 # start and end years
-startyear = 1945
+startyear = 1967
 endyear = 2000
 
 # ARRAY CREATION
@@ -863,35 +863,35 @@ comactor_sig_pvalue = z[1]
 
 # performing those same correlations on a per decade basis SIG & RAT
 j = startyear
-comactor_sig_list_40s = list()
-comactor_sig_list_50s = list()
+# comactor_sig_list_40s = list()
+# comactor_sig_list_50s = list()
 comactor_sig_list_60s = list()
 comactor_sig_list_70s = list()
 comactor_sig_list_80s = list()
 comactor_sig_list_90s = list()  # includes 2000
-comactor_rat_list_40s = list()
-comactor_rat_list_50s = list()
+# comactor_rat_list_40s = list()
+# comactor_rat_list_50s = list()
 comactor_rat_list_60s = list()
 comactor_rat_list_70s = list()
 comactor_rat_list_80s = list()
 comactor_rat_list_90s = list()  # includes 2000
-worldproliflist_40s = list()
-worldproliflist_50s = list()
+# worldproliflist_40s = list()
+# worldproliflist_50s = list()
 worldproliflist_60s = list()
 worldproliflist_70s = list()
 worldproliflist_80s = list()
 worldproliflist_90s = list()  # includes 2000
-while j < 1950:
-    comactor_sig_list_40s.append(comactor_sig_values_dict[j])
-    comactor_rat_list_40s.append(comactor_rat_values_dict[j])
-    worldproliflist_40s.append(world_prolif_dict[j])
-    j += 1
-while j > 1949 and j < 1960:
-    comactor_sig_list_50s.append(comactor_sig_values_dict[j])
-    comactor_rat_list_50s.append(comactor_rat_values_dict[j])
-    worldproliflist_50s.append(world_prolif_dict[j])
-    j += 1
-while j > 1959 and j < 1970:
+# while j < 1950:
+#     comactor_sig_list_40s.append(comactor_sig_values_dict[j])
+#     comactor_rat_list_40s.append(comactor_rat_values_dict[j])
+#     worldproliflist_40s.append(world_prolif_dict[j])
+#     j += 1
+# while j > 1949 and j < 1960:
+#     comactor_sig_list_50s.append(comactor_sig_values_dict[j])
+#     comactor_rat_list_50s.append(comactor_rat_values_dict[j])
+#     worldproliflist_50s.append(world_prolif_dict[j])
+#     j += 1
+while j > 1966 and j < 1970:
     comactor_sig_list_60s.append(comactor_sig_values_dict[j])
     comactor_rat_list_60s.append(comactor_rat_values_dict[j])
     worldproliflist_60s.append(world_prolif_dict[j])
@@ -913,48 +913,48 @@ while j > 1989 and j < 2001:
     j += 1
 
 # correlating common actors values with global proliferation levels by decade
-# 40s, 50s, 60s, 70s, 80s, 90s
+# 60s, 70s, 80s, 90s
 comactor_sig_corr_bydecade = list()
 comactor_sig_pvalue_bydecade = list()
 comactor_rat_corr_bydecade = list()
 comactor_rat_pvalue_bydecade = list()
-z = pearsonr(worldproliflist_40s, comactor_sig_list_40s)
-if z[0] != z[0]:
-    comactor_sig_corr_bydecade.append(0)
-else:
-    comactor_sig_corr_bydecade.append(z[0])
-if z[1] != z[1]:
-    comactor_sig_pvalue_bydecade.append(0)
-else:
-    comactor_sig_pvalue_bydecade.append(z[1])
-z = pearsonr(worldproliflist_40s, comactor_rat_list_40s)
-if z[0] != z[0]:
-    comactor_rat_corr_bydecade.append(0)
-else:
-    comactor_rat_corr_bydecade.append(z[0])
-if z[1] != z[1]:
-    comactor_rat_pvalue_bydecade.append(0)
-else:
-    comactor_rat_pvalue_bydecade.append(z[1])
+# z = pearsonr(worldproliflist_40s, comactor_sig_list_40s)
+# if z[0] != z[0]:
+#     comactor_sig_corr_bydecade.append(0)
+# else:
+#     comactor_sig_corr_bydecade.append(z[0])
+# if z[1] != z[1]:
+#     comactor_sig_pvalue_bydecade.append(0)
+# else:
+#     comactor_sig_pvalue_bydecade.append(z[1])
+# z = pearsonr(worldproliflist_40s, comactor_rat_list_40s)
+# if z[0] != z[0]:
+#     comactor_rat_corr_bydecade.append(0)
+# else:
+#     comactor_rat_corr_bydecade.append(z[0])
+# if z[1] != z[1]:
+#     comactor_rat_pvalue_bydecade.append(0)
+# else:
+#     comactor_rat_pvalue_bydecade.append(z[1])
 
-z = pearsonr(worldproliflist_50s, comactor_sig_list_50s)
-if z[0] != z[0]:
-    comactor_sig_corr_bydecade.append(0)
-else:
-    comactor_sig_corr_bydecade.append(z[0])
-if z[1] != z[1]:
-    comactor_sig_pvalue_bydecade.append(0)
-else:
-    comactor_sig_pvalue_bydecade.append(z[1])
-z = pearsonr(worldproliflist_50s, comactor_rat_list_50s)
-if z[0] != z[0]:
-    comactor_rat_corr_bydecade.append(0)
-else:
-    comactor_rat_corr_bydecade.append(z[0])
-if z[1] != z[1]:
-    comactor_rat_pvalue_bydecade.append(0)
-else:
-    comactor_rat_pvalue_bydecade.append(z[1])
+# z = pearsonr(worldproliflist_50s, comactor_sig_list_50s)
+# if z[0] != z[0]:
+#     comactor_sig_corr_bydecade.append(0)
+# else:
+#     comactor_sig_corr_bydecade.append(z[0])
+# if z[1] != z[1]:
+#     comactor_sig_pvalue_bydecade.append(0)
+# else:
+#     comactor_sig_pvalue_bydecade.append(z[1])
+# z = pearsonr(worldproliflist_50s, comactor_rat_list_50s)
+# if z[0] != z[0]:
+#     comactor_rat_corr_bydecade.append(0)
+# else:
+#     comactor_rat_corr_bydecade.append(z[0])
+# if z[1] != z[1]:
+#     comactor_rat_pvalue_bydecade.append(0)
+# else:
+#     comactor_rat_pvalue_bydecade.append(z[1])
 
 z = pearsonr(worldproliflist_60s, comactor_sig_list_60s)
 if z[0] != z[0]:
@@ -1032,13 +1032,13 @@ if z[1] != z[1]:
 else:
     comactor_rat_pvalue_bydecade.append(z[1])
 
-decades_list = (40, 50, 60, 70, 80, 90)
+decades_list = (60, 70, 80, 90)
 
 # row 1 is common actor signature correlations
 # row 2 is the p values
 # row 3 is common actor ratification correlations
 # row 4 is the p values
-# column 1 = 40s, 2=50s, 3=60s, 4=70s, 5=80s, 6=90s
+# column 1=60s, 2=70s, 3=80s, 4=90s
 np.savetxt('common_actor_correlation_decades_output.txt', (comactor_sig_corr_bydecade, comactor_sig_pvalue_bydecade,
                                                            comactor_rat_corr_bydecade, comactor_rat_pvalue_bydecade), delimiter=',')
 
@@ -1081,27 +1081,27 @@ density_sig_pvalue = z[1]
 
 # performing those same correlations on a per decade basis SIG & RAT
 j = startyear
-density_sig_list_40s = list()
-density_sig_list_50s = list()
+# density_sig_list_40s = list()
+# density_sig_list_50s = list()
 density_sig_list_60s = list()
 density_sig_list_70s = list()
 density_sig_list_80s = list()
 density_sig_list_90s = list()  # includes 2000
-density_rat_list_40s = list()
-density_rat_list_50s = list()
+# density_rat_list_40s = list()
+# density_rat_list_50s = list()
 density_rat_list_60s = list()
 density_rat_list_70s = list()
 density_rat_list_80s = list()
 density_rat_list_90s = list()  # includes 2000
-while j < 1950:
-    density_sig_list_40s.append(density_sig_dict[j])
-    density_rat_list_40s.append(density_rat_dict[j])
-    j += 1
-while j > 1949 and j < 1960:
-    density_sig_list_50s.append(density_sig_dict[j])
-    density_rat_list_50s.append(density_rat_dict[j])
-    j += 1
-while j > 1959 and j < 1970:
+# while j < 1950:
+#     density_sig_list_40s.append(density_sig_dict[j])
+#     density_rat_list_40s.append(density_rat_dict[j])
+#     j += 1
+# while j > 1949 and j < 1960:
+#     density_sig_list_50s.append(density_sig_dict[j])
+#     density_rat_list_50s.append(density_rat_dict[j])
+#     j += 1
+while j > 1966 and j < 1970:
     density_sig_list_60s.append(density_sig_dict[j])
     density_rat_list_60s.append(density_rat_dict[j])
     j += 1
@@ -1119,48 +1119,48 @@ while j > 1989 and j < 2001:
     j += 1
 
 # correlating common actors values with global proliferation levels by decade
-# 40s, 50s, 60s, 70s, 80s, 90s
+# 60s, 70s, 80s, 90s
 density_sig_corr_bydecade = list()
 density_sig_pvalue_bydecade = list()
 density_rat_corr_bydecade = list()
 density_rat_pvalue_bydecade = list()
-z = pearsonr(worldproliflist_40s, density_sig_list_40s)
-if z[0] != z[0]:
-    density_sig_corr_bydecade.append(0)
-else:
-    density_sig_corr_bydecade.append(z[0])
-if z[1] != z[1]:
-    density_sig_pvalue_bydecade.append(0)
-else:
-    density_sig_pvalue_bydecade.append(z[1])
-z = pearsonr(worldproliflist_40s, density_rat_list_40s)
-if z[0] != z[0]:
-    density_rat_corr_bydecade.append(0)
-else:
-    density_rat_corr_bydecade.append(z[0])
-if z[1] != z[1]:
-    density_rat_pvalue_bydecade.append(0)
-else:
-    density_rat_pvalue_bydecade.append(z[1])
+# z = pearsonr(worldproliflist_40s, density_sig_list_40s)
+# if z[0] != z[0]:
+#     density_sig_corr_bydecade.append(0)
+# else:
+#     density_sig_corr_bydecade.append(z[0])
+# if z[1] != z[1]:
+#     density_sig_pvalue_bydecade.append(0)
+# else:
+#     density_sig_pvalue_bydecade.append(z[1])
+# z = pearsonr(worldproliflist_40s, density_rat_list_40s)
+# if z[0] != z[0]:
+#     density_rat_corr_bydecade.append(0)
+# else:
+#     density_rat_corr_bydecade.append(z[0])
+# if z[1] != z[1]:
+#     density_rat_pvalue_bydecade.append(0)
+# else:
+#     density_rat_pvalue_bydecade.append(z[1])
 
-z = pearsonr(worldproliflist_50s, density_sig_list_50s)
-if z[0] != z[0]:
-    density_sig_corr_bydecade.append(0)
-else:
-    density_sig_corr_bydecade.append(z[0])
-if z[1] != z[1]:
-    density_sig_pvalue_bydecade.append(0)
-else:
-    density_sig_pvalue_bydecade.append(z[1])
-z = pearsonr(worldproliflist_50s, density_rat_list_50s)
-if z[0] != z[0]:
-    density_rat_corr_bydecade.append(0)
-else:
-    density_rat_corr_bydecade.append(z[0])
-if z[1] != z[1]:
-    density_rat_pvalue_bydecade.append(0)
-else:
-    density_rat_pvalue_bydecade.append(z[1])
+# z = pearsonr(worldproliflist_50s, density_sig_list_50s)
+# if z[0] != z[0]:
+#     density_sig_corr_bydecade.append(0)
+# else:
+#     density_sig_corr_bydecade.append(z[0])
+# if z[1] != z[1]:
+#     density_sig_pvalue_bydecade.append(0)
+# else:
+#     density_sig_pvalue_bydecade.append(z[1])
+# z = pearsonr(worldproliflist_50s, density_rat_list_50s)
+# if z[0] != z[0]:
+#     density_rat_corr_bydecade.append(0)
+# else:
+#     density_rat_corr_bydecade.append(z[0])
+# if z[1] != z[1]:
+#     density_rat_pvalue_bydecade.append(0)
+# else:
+#     density_rat_pvalue_bydecade.append(z[1])
 
 z = pearsonr(worldproliflist_60s, density_sig_list_60s)
 if z[0] != z[0]:
@@ -1242,7 +1242,7 @@ else:
 # row 2 is the p values
 # row 3 is density ratification correlations
 # row 4 is the p values
-# column 1 = 40s, 2=50s, 3=60s, 4=70s, 5=80s, 6=90s
+# column 1=60s, 2=70s, 3=80s, 4=90s
 np.savetxt('density_correlation_decades_output.txt', (density_sig_corr_bydecade, density_sig_pvalue_bydecade,
                                                       density_rat_corr_bydecade, density_rat_pvalue_bydecade), delimiter=',')
 
@@ -1280,40 +1280,43 @@ print('code done running')
 # plt.plot(yeararray, NWFZsigarray, 'y--', label='NWFZ Signature')  # yellow dash
 # plt.plot(yeararray, NWFZratarray, 'y-', label='NWFZ Ratification')  # yellow line
 # plt.xlabel('Year', fontsize='medium')
-# plt.ylabel('Centrality', fontsize='medium')
-# plt.legend(loc=2, fontsize='medium')
-# plt.title('Treaty Eigenvector Centralities in 1945-2000', fontsize='medium')
+# plt.ylabel('Treaty EVC', fontsize='medium')
+# plt.legend(loc=4, fontsize='medium')
+# plt.title('Treaty EVCs in 1967-2000', fontsize='medium')
 # plt.ylim(-0.1, 1.1)
-# plt.xlim(1944, 2001)
+# plt.xlim(1966, 2001)
 
 # # plot NPT centralities versus global proliferation
 # # file name is NPT Cent_noNWS
 # plt.plot(worldproliflist, NPTratarray, 'ko', label='Ratification Network')
 # plt.plot(worldproliflist, NPTsigarray, 'w^', label='Signature Network')
 # plt.xlabel('Global Proliferation Level', fontsize='medium')
-# plt.ylabel('Treaty Centrality', fontsize='medium')
-# plt.legend(loc=2, fontsize='medium')
-# plt.title('NPT Centralities', fontsize='medium')
+# plt.ylabel('NPT EVC', fontsize='medium')
+# plt.legend(loc=4, fontsize='medium')
+# plt.title('NPT EVC versus Global Proliferation', fontsize='medium')
 # plt.ylim(-0.1, 1.1)
+# plt.xlim(25, 45)
 
 # # plot NWFZ centralities versus global proliferation
 # # file name is NWFZ Cent_noNWS
 # plt.plot(worldproliflist, NWFZratarray, 'ko', label='Ratification Network')
 # plt.plot(worldproliflist, NWFZsigarray, 'w^', label='Signature Network')
 # plt.xlabel('Global Proliferation Level', fontsize='medium')
-# plt.ylabel('Treaty Centrality', fontsize='medium')
-# plt.legend(loc=2, fontsize='medium')
-# plt.title('NWFZ Centralities', fontsize='medium')
+# plt.ylabel('NWFZ EVC', fontsize='medium')
+# plt.legend(loc=4, fontsize='medium')
+# plt.title('NWFZ EVC versus Global Proliferation', fontsize='medium')
 # plt.ylim(-0.1, 1.1)
+# plt.xlim(25, 45)
 
 # # plot both signature and ratification correlations
 # # file name is Corr Values by Year_noNWS
 # plt.plot(yeararray, corr_yearly_array_rat, 'ko', label='Ratification Network')
 # plt.plot(yeararray, corr_yearly_array_sig, 'w^', label='Signature Network')
-# plt.legend(loc=1, fontsize='medium')
+# plt.axhline(0, color='black', ls='dashed')
+# plt.legend(loc=3, fontsize='medium')
 # plt.title('Yearly Correlation Values', fontsize='medium')
 # plt.xlabel('Year', fontsize='medium')
-# plt.ylabel('State Centrality/Proliferation Correlation Coefficient', fontsize='medium')
+# plt.ylabel('State EVC/Proliferation Correlation Coefficient', fontsize='medium')
 
 # # save sig and rat correlations in txt file
 # x = np.reshape(yeararray, (len(yeararray), 1))
@@ -1349,9 +1352,9 @@ print('code done running')
 # plt.plot(prolif_dict[1974][:, 2], country_centrality_rat_dict[1974][:, 1], 'ko', label='Ratification Network')
 # plt.plot(prolif_dict[1974][:, 2], country_centrality_sig_dict[1974][:, 1], 'w^', label='Signature Network')
 # plt.legend(loc=1, fontsize='medium')
-# plt.title('State Centrality and Proliferation Levels in 1974', fontsize='medium')
+# plt.title('State EVC and Proliferation Levels in 1974', fontsize='medium')
 # plt.xlabel('State Proliferation', fontsize='medium')
-# plt.ylabel('State Centrality', fontsize='medium')
+# plt.ylabel('State EVC', fontsize='medium')
 # plt.xlim(-0.5, 3.5)
 # plt.ylim(-0.05, 0.30)
 
@@ -1371,29 +1374,40 @@ print('code done running')
 
 # # plot density versus global proliferation SIG
 # plt.plot(worldproliflist,density_sig_list, 'w^', label='Signature Density')
-# plt.title('Signature Density', fontsize='medium')
+# plt.title('Signature Network Density', fontsize='medium')
 # plt.xlabel('Global Proliferation Level', fontsize='medium')
 # plt.ylabel('Network Density', fontsize='medium')
 # plt.ylim(-0.1, 1)
 
 # # plot density versus global proliferation RAT
 # plt.plot(worldproliflist, density_rat_list, 'ko', label='Ratification Density')
-# plt.title('Ratification Density', fontsize='medium')
+# plt.title('Ratification Network Density', fontsize='medium')
 # plt.xlabel('Global Proliferation Level', fontsize='medium')
 # plt.ylabel('Network Density', fontsize='medium')
 # plt.ylim(-0.1, 0.8)
 
+# PLOTS FOR PRESENTATION
+
+# # plot density correlations by decade
+# plt.plot(decades_list, density_rat_corr_bydecade, 'ko', label='Ratification Correlation')
+# plt.plot(decades_list, density_sig_corr_bydecade, 'w^', label='Signature Correlation')
+# plt.legend(loc=3, fontsize='large')
+# plt.title('Decade Density Correlation Values')
+# plt.xlabel('Decade', fontsize='large')
+# plt.ylabel('Density/Global Proliferation Correlation', fontsize='large')
+# plt.xlim(55, 95)
+
+# plot common actor correlations by decade
+plt.plot(decades_list, comactor_rat_corr_bydecade, 'ko', label='Ratification Correlation')
+plt.plot(decades_list, comactor_sig_corr_bydecade, 'w^', label='Signature Correlation')
+plt.legend(loc=3, fontsize='large')
+plt.title('Decade Common Actor Correlation Values')
+plt.xlabel('Decade', fontsize='large')
+plt.ylabel('Common Actor/Global Proliferation Correlation', fontsize='large')
+plt.xlim(55, 95)
+
 
 # PLOTS NOT FOR PAPER
-
-# # plot common actor correlations by decade
-# plt.plot(decades_list, comactor_rat_corr_bydecade, 'ko', label='Ratification Correlation')
-# plt.plot(decades_list, comactor_sig_corr_bydecade, 'w^', label='Signature Correlation')
-# plt.legend(loc=3, fontsize='large')
-# plt.title('Decade Common Actor Correlation Values')
-# plt.xlabel('Decade', fontsize='large')
-# plt.ylabel('Common Actor/Global Proliferation Correlation', fontsize='large')
-# plt.xlim(35, 95)
 
 # # plot treaty signature centralities and label the lines
 # plt.plot(yeararray, NPTsigarray, 'b-', label='NPT Signature')
@@ -1459,14 +1473,6 @@ print('code done running')
 # plt.xlabel('Year', fontsize='large')
 # plt.ylabel('Centrality / Proliferation Level', fontsize='large')
 
-# # plot density correlations by decade
-# plt.plot(decades_list, density_rat_corr_bydecade, 'ko', label='Ratification Correlation')
-# plt.plot(decades_list, density_sig_corr_bydecade, 'w^', label='Signature Correlation')
-# plt.legend(loc=3, fontsize='large')
-# plt.title('Decade Density Correlation Values')
-# plt.xlabel('Decade', fontsize='large')
-# plt.ylabel('Density/Global Proliferation Correlation', fontsize='large')
-# plt.xlim(35, 95)
 
 
 # USELESS CODE THAT MAYBE I DON'T WANT TO DELETE YET
