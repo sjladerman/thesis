@@ -1386,6 +1386,12 @@ print('code done running')
 # plt.ylabel('Network Density', fontsize='medium')
 # plt.ylim(-0.1, 0.8)
 
+
+
+
+# PLOTS NOT FOR PAPER
+
+
 # PLOTS FOR PRESENTATION
 
 # # plot density correlations by decade
@@ -1397,17 +1403,14 @@ print('code done running')
 # plt.ylabel('Density/Global Proliferation Correlation', fontsize='large')
 # plt.xlim(55, 95)
 
-# plot common actor correlations by decade
-plt.plot(decades_list, comactor_rat_corr_bydecade, 'ko', label='Ratification Correlation')
-plt.plot(decades_list, comactor_sig_corr_bydecade, 'w^', label='Signature Correlation')
-plt.legend(loc=3, fontsize='large')
-plt.title('Decade Common Actor Correlation Values')
-plt.xlabel('Decade', fontsize='large')
-plt.ylabel('Common Actor/Global Proliferation Correlation', fontsize='large')
-plt.xlim(55, 95)
-
-
-# PLOTS NOT FOR PAPER
+# # plot common actor correlations by decade
+# plt.plot(decades_list, comactor_rat_corr_bydecade, 'ko', label='Ratification Correlation')
+# plt.plot(decades_list, comactor_sig_corr_bydecade, 'w^', label='Signature Correlation')
+# plt.legend(loc=3, fontsize='large')
+# plt.title('Decade Common Actor Correlation Values')
+# plt.xlabel('Decade', fontsize='large')
+# plt.ylabel('Common Actor/Global Proliferation Correlation', fontsize='large')
+# plt.xlim(55, 95)
 
 # # plot treaty signature centralities and label the lines
 # plt.plot(yeararray, NPTsigarray, 'b-', label='NPT Signature')
